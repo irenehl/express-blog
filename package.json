@@ -12,7 +12,7 @@
         "lint": "eslint --ext .js,.ts .",
         "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
         "test": "jest", 
-        "faker": "ts-node --compiler-options '{\"module\": \"CommonJS\"}' \"prisma/seed.ts\""
+        "seed": "ts-node --compiler-options '{\"module\": \"CommonJS\"}' \"prisma/seed.ts\""
     },
     "dependencies": {
         "@prisma/client": "^4.14.0",
