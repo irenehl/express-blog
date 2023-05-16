@@ -1,9 +1,11 @@
 {
     "compilerOptions": {
+        "target": "ESNext",
+        "module": "CommonJS",
+        "strict": true,
+        "esModuleInterop": true,
         "sourceMap": true,
         "outDir": "dist",
-        "strict": true,
-        "lib": ["esnext"],
-        "esModuleInterop": true
+        "forceConsistentCasingInFileNames": true
     }
 }

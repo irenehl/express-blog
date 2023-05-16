@@ -8,73 +8,73 @@ datasource db {
 }
 
 model Account {
-    id          Int      @id @default(autoincrement())
-    name        String   @db.VarChar(50)
-    lastname    String   @db.VarChar(50)
-    email       String   @unique
-    password    String
-    publicEmail Boolean  @default(false)
-    role        Role     @default(USER)
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @default(now())
+    id              Int      @id @default(autoincrement())
+    name            String   @db.VarChar(50)
+    lastname        String   @db.VarChar(50)
+    email           String   @unique
+    password        String
+    role            Role     @default(USER)
+    created_at      DateTime @default(now())
+    updated_at      DateTime @default(now())
+    is_public_email Boolean  @default(false)
+    is_public_name  Boolean  @default(false)
 
-    comments        Comment[]
-    posts           Post[]
-    likesOnComments LikesOnComments[]
-    likesOnPosts    LikesOnPosts[]
-	reports			Report[]
+    comments          Comment[]
+    posts             Post[]
+    reports           Report[]
+    likes_on_comments LikesOnComments[]
+    likes_on_posts    LikesOnPosts[]
 }
 
 model Comment {
-    id        Int           @id @unique @default(autoincrement())
-    content   String
-    createdAt DateTime      @default(now())
-    updatedAt DateTime      @default(now())
-    status    ContentStatus @default(PUBLISHED)
+    id         Int           @id @unique @default(autoincrement())
+    content    String
+    status     ContentStatus @default(PUBLISHED)
+    created_at DateTime      @default(now())
+    updated_at DateTime      @default(now())
 
-	reports Report?
+    reports Report?
 
-    author    Account @relation(fields: [accountId], references: [id])
-    accountId Int     @unique
+    author     Account @relation(fields: [account_id], references: [id])
+    account_id Int     @unique
 
-    post   Post @relation(fields: [postId], references: [id])
-    postId Int
+    post    Post @relation(fields: [post_id], references: [id])
+    post_id Int
 
-    likesOnComments LikesOnComments[]
+    likes_on_comments LikesOnComments[]
 }
 
 model Post {
-    id        Int      @id @unique @default(autoincrement())
-    content   String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @default(now())
-    status    ContentStatus @default(PUBLISHED)
+    id         Int           @id @unique @default(autoincrement())
+    content    String
+    status     ContentStatus @default(PUBLISHED)
+    created_at DateTime      @default(now())
+    updated_at DateTime      @default(now())
 
-	reports Report?
+    reports Report?
 
-    author    Account @relation(fields: [accountId], references: [id])
-    accountId Int     @unique
+    author     Account @relation(fields: [account_id], references: [id])
+    account_id Int     @unique
 
-    comments     Comment[]
-    likesOnPosts LikesOnPosts[]
+    comments       Comment[]
+    likes_on_posts LikesOnPosts[]
 }
 
 model Report {
-	id Int @unique @default(autoincrement())
-	description String
-	createdAt DateTime      @default(now())
+    id          Int      @unique @default(autoincrement())
+    description String
+    created_at  DateTime @default(now())
 
-	author   Account @relation(fields: [authorId], references: [id])
+    author   Account @relation(fields: [authorId], references: [id])
     authorId Int
 
-	comment  Comment @relation(fields: [commentId], references: [id])
-    commentId Int @unique
+    comment   Comment @relation(fields: [commentId], references: [id])
+    commentId Int     @unique
 
-	post   Post @relation(fields: [postId], references: [id])
-    postId Int @unique
+    post    Post @relation(fields: [post_id], references: [id])
+    post_id Int  @unique
 
-	@@id([id, authorId, commentId, postId])
-
+    @@id([id, authorId, commentId, post_id])
 }
 
 model LikesOnComments {
@@ -92,13 +92,13 @@ model LikesOnComments {
 model LikesOnPosts {
     id Int @unique @default(autoincrement())
 
-    post   Post @relation(fields: [postId], references: [id])
-    postId Int
+    post    Post @relation(fields: [post_id], references: [id])
+    post_id Int
 
     author   Account @relation(fields: [authorId], references: [id])
     authorId Int     @unique
 
-    @@id([id, postId, authorId])
+    @@id([id, post_id, authorId])
 }
 
 enum ContentStatus {
