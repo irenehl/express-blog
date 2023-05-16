@@ -1,14 +1,15 @@
-import http from 'http'
+require('express-async-errors')
+import express from 'express'
+import baseRouter from './common/base-router'
+import errorHandler from './middlewares/error.mid'
+const app = express()
 
-const hostname = '127.0.0.1'
-const port = 3000
+app.use(express.json())
 
-const server = http.createServer((req, res) => {
-    res.statusCode = 200
-    res.setHeader('Content-Type', 'text/plain')
-    res.end('Hello World')
-})
+app.use('/api', baseRouter)
 
-server.listen(port, hostname, () => {
-    console.log(`Server running at http://${hostname}:${port}/`)
+app.use(errorHandler)
+
+app.listen(process.env.PORT ?? 3000, () => {
+    console.log(`Running on port: ${process.env.PORT}`)
 })
