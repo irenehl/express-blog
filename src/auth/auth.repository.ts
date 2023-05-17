@@ -28,8 +28,8 @@ export class AuthRepository extends BaseRepository<Account> {
                 'email',
                 'password',
                 'lastname',
-                'created_at',
-                'updated_at',
+                'createdAt',
+                'updatedAt',
             ])
 
         return null

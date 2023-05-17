@@ -21,8 +21,20 @@ export class AccountController {
     }
 
     async getAll(req: Request, res: Response) {
-        const accounts = await this.accountService.getAll()
+        const accounts = await this.accountService.getAll(req.query)
 
         return res.status(200).json(accounts)
+    }
+
+    async update(req: Request, res: Response) {
+        return res
+            .status(200)
+            .json(await this.accountService.update(+req.params.id, req.body))
+    }
+
+    async delete(req: Request, res: Response) {
+        return res
+            .status(200)
+            .json(await this.accountService.delete(+req.params.id))
     }
 }

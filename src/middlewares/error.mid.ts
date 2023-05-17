@@ -10,7 +10,7 @@ export default function errorHandler(
     if (err instanceof HttpError)
         return res.status(err.getStatusCode()).json({ message: err.message })
 
-    if (err) return res.status(400).json({ message: 'Something went wrong' })
+    if (err) return res.status(400).json({ message: err.message })
 
     next()
 }

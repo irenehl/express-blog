@@ -3,6 +3,8 @@ import { AccountRepository } from './account.repository'
 import { HttpError } from '../common/http-error'
 import { AccountDto } from './dtos/account.dto'
 import { GetAccountDto } from './dtos/get-account.dto'
+import { IPagionation } from '../common/pagination-interface'
+import { UpdateAccountDto } from './dtos/update-account.dto'
 
 const accountRepository = new AccountRepository()
 
@@ -29,7 +31,19 @@ export class AccountService {
         return user
     }
 
-    async getAll(): Promise<AccountDto[]> {
-        return accountRepository.getAll()
+    async getAll(data: IPagionation): Promise<AccountDto[]> {
+        return accountRepository.getAll(data)
+    }
+
+    async update(id: number, data: UpdateAccountDto): Promise<AccountDto> {
+        const account = await this.accountRepository.update(id, data)
+
+        if (!account) throw new HttpError(400, 'Something went wrong')
+
+        return account
+    }
+
+    async delete(id: number): Promise<AccountDto> {
+        return await this.accountRepository.delete(id)
     }
 }
