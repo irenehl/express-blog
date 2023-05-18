@@ -1,14 +1,14 @@
-import bcrypt from 'bcrypt'
-import { Account, Prisma } from '@prisma/client'
-import { PrismaClient } from '@prisma/client'
-import { BaseRepository } from '../common/base-repository'
+import bcrypt from 'bcrypt';
+import { Account, Prisma } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+import { BaseRepository } from '../common/base-repository';
 
 export class AuthRepository extends BaseRepository<Account> {
-    private readonly prismaClient: PrismaClient
+    private readonly prismaClient: PrismaClient;
 
     constructor() {
-        super()
-        this.prismaClient = new PrismaClient()
+        super();
+        this.prismaClient = new PrismaClient();
     }
 
     async authorize(query: Prisma.AccountWhereUniqueInput, password: string) {
@@ -16,11 +16,11 @@ export class AuthRepository extends BaseRepository<Account> {
             where: {
                 ...query,
             },
-        })
+        });
 
         const isValid = account
             ? bcrypt.compare(password, account?.password)
-            : false
+            : false;
 
         if (isValid)
             return this.exclude(account!, [
@@ -30,8 +30,8 @@ export class AuthRepository extends BaseRepository<Account> {
                 'lastname',
                 'createdAt',
                 'updatedAt',
-            ])
+            ]);
 
-        return null
+        return null;
     }
 }
