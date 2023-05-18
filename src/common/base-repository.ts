@@ -4,9 +4,9 @@ export class BaseRepository<TEntity> {
         keys: KExclude[]
     ): Omit<TEntity, KExclude> {
         for (const key of keys) {
-            delete entity[key]
+            delete entity[key];
         }
 
-        return entity
+        return entity;
     }
 }

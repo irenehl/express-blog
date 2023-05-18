@@ -1,18 +1,22 @@
-require('express-async-errors')
-import express from 'express'
-import baseRouter from './common/base-router'
-import errorHandler from './middlewares/error.mid'
-import passportConfig from './config/passport'
-const app = express()
+require('express-async-errors');
+import express from 'express';
+import baseRouter from './common/base-router';
+import errorHandler from './middlewares/error.mid';
+import passportConfig from './config/passport';
+import passport from 'passport';
 
-app.use(express.json())
+passport.use(passportConfig());
 
-app.use('/api', baseRouter)
+const app = express();
 
-app.use(errorHandler)
+passportConfig();
 
-app.use(passportConfig)
+app.use(express.json());
+
+app.use('/api', baseRouter);
+
+app.use(errorHandler);
 
 app.listen(process.env.PORT ?? 3000, () => {
-    console.log(`Running on port: ${process.env.PORT}`)
-})
+    console.log(`Running on port: ${process.env.PORT}`);
+});

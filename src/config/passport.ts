@@ -1,25 +1,25 @@
-import passportJwt from 'passport-jwt'
-import { AccountService } from '../account/acount.service'
+import passportJwt from 'passport-jwt';
+import { AccountService } from '../account/acount.service';
 
-const JwtStrategy = passportJwt.Strategy
-const ExtractJwt = passportJwt.ExtractJwt
+const JwtStrategy = passportJwt.Strategy;
+const ExtractJwt = passportJwt.ExtractJwt;
 
 export default function passportConfig() {
-    const accountService = new AccountService()
+    const accountService = new AccountService();
 
-    new JwtStrategy(
+    return new JwtStrategy(
         {
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             secretOrKey: process.env.JWT_SECRET,
         },
         async function (jwtToken, done) {
-            const account = await accountService.getUser(jwtToken.id)
+            const account = await accountService.getUser({ id: jwtToken.id });
 
             if (!account) {
-                return done(new Error('Something went wrong'), false)
+                return done(new Error('Something went wrong'), false);
             } else {
-                return done(null, account)
+                return done(null, account);
             }
         }
-    )
+    );
 }

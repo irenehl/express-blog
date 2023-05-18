@@ -1,3 +1,3 @@
-import { Prisma } from '@prisma/client'
+import { Prisma } from '@prisma/client';
 
-export type GetAccountDto = Prisma.AccountWhereUniqueInput
+export type GetAccountDto = Prisma.AccountWhereUniqueInput;

@@ -1,6 +1,6 @@
-import { Prisma } from '@prisma/client'
+import { Prisma } from '@prisma/client';
 
 export type CreateAccountDto = Omit<
     Prisma.AccountCreateInput,
     'createdAt' | 'updatedAt' | 'role'
->
+>;
