@@ -35,8 +35,8 @@ model Comment {
 
     reports     Report?
 
-    author      Account           @relation(fields: [accountId], references: [id])
-    accountId   Int               @unique @map("account_id")
+    author      Account           @relation(fields: [authorId], references: [id])
+    authorId   Int                @map("author_id")
 
     post        Post              @relation(fields: [postId], references: [id])
     postId      Int               @map("post_id")
@@ -54,7 +54,7 @@ model Post {
     reports   Report?
 
     author    Account       @relation(fields: [authorId], references: [id])
-    authorId Int           @unique @map("author_id")
+    authorId  Int           @map("author_id")
 
     comments       Comment[]
     likesOnPosts   LikesOnPosts[]
@@ -96,7 +96,7 @@ model LikesOnPosts {
     postId         Int         @map("post_id")
 
     author         Account     @relation(fields: [authorId], references: [id])
-    authorId       Int         @unique @map("author_id")
+    authorId       Int         @map("author_id")
 
     @@id([id, postId, authorId])
 }
