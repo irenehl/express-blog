@@ -29,6 +29,7 @@ async function main() {
                     from: '2000-01-01T00:00:00.000Z',
                     to: '2022-01-01T00:00:00.000Z',
                 }),
+                authorId: i,
             },
         });
     }
@@ -42,6 +43,8 @@ async function main() {
                     to: '2022-01-01T00:00:00.000Z',
                 }),
                 status: 'PUBLISHED',
+                authorId: i,
+                postId: i,
             },
         });
     }
