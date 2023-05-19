@@ -1,0 +1,720 @@
+openapi: 3.0.3
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/irenehl/blog/1.0.0
+info:
+  description: Open API Specification
+  version: "1.0.0"
+  title: Nerdery Rest API - Blog
+  contact:
+    email: danielalopez@ravn.co
+  license:
+    name: MIT
+tags:
+  - name: accounts
+paths:
+  /login: 
+    post:
+      tags: 
+        - auth
+      summary: login a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Account'
+        '400':
+          description: Something went wrong 
+  /account:
+    post:
+      tags:
+        - accounts
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Account'
+        '400':
+          description: Something went wrong
+  /account/:id:
+    get:
+      tags:
+        - accounts
+      summary: Returns a specific account
+      description: Return all the users that are in the blog.
+      parameters: 
+        - in: query
+          name: id
+          schema:
+            type: integer
+          description: Account id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Account'
+        '404': 
+          description: Account not found
+  /account/:
+    get:
+      tags:
+        - accounts
+      summary: Return all the accounts registered
+      description: Return all the users that are in the blog.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Account'
+  /:id:
+    patch:
+      security:
+      - bearerAuth: []
+      tags: 
+        - accounts
+      summary: Update a field from a user 
+      description: Return an updated account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAccount'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateAccount'
+        '404': 
+          description: Account not found
+        '403':
+          description: Denied access
+  /:accountId:
+    delete:
+      security:
+      - bearerAuth: []
+      tags:
+        - accounts
+      summary: 
+        Delete an specific account if you have access to do it
+      parameters:
+        - in: query
+          name: id
+          schema: 
+            type: integer
+          description: Account id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '404': 
+          description: Account not found
+  /post:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - posts
+      summary: Create a new post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Post'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Post'
+        '400': 
+          description: Bad request
+  /post/:
+    get:
+      tags:
+        - posts
+      summary:
+        Return all the posts
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Post'
+  /post/:id:
+    get:
+      tags:
+        - posts
+      summary: Returns a specific post
+      parameters: 
+        - in: query
+          name: id
+          schema:
+            type: integer
+          description: Post id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Post'
+        '400':
+          description: Bad request
+        '404': 
+          description: Post not found
+  /post/:postId/reactions:
+    get:
+      tags:
+        - posts
+      summary: Returns a specific post
+      parameters: 
+        - in: query
+          name: id
+          schema:
+            type: integer
+          description: Post id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Reaction'
+        '400':
+          description: Bad request
+        '404': 
+          description: Post not found
+  /post/:postId:
+    patch:
+      security:
+        - bearerAuth: []
+      tags: 
+        - posts
+      summary: Update a field from a post 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePost'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdatePost'
+        '404': 
+          description: Post not found
+        '403':
+          description: 'Access denied' 
+  /post/:id/reactions:
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - posts
+      summary: Set a reaction to the post
+      requestBody: 
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reaction'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Post'
+        '400': 
+          description: Bad request
+        '404': 
+          description: Item not found
+        '403':
+          description: 'Access denied'
+  /post/:id/:
+    delete:
+      security:
+      - bearerAuth: []
+      tags:
+        - posts
+      summary: Delete an specific post
+      parameters:
+        - in: query
+          name: id
+          schema: 
+            type: integer
+          description: Post id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404': 
+          description: Post not found
+        '403':
+          description: 'Access denied' 
+  /comment:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - comments
+      summary: Create a new post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Account'
+        '400': 
+          description: Bad request
+  /post/:postId/comment/:
+    get:
+      tags:
+        - comments
+      summary:
+        Returns all the comments from a post
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Comment'
+  /post/:postId/comment/:id:
+    get:
+      tags:
+        - comments
+      summary: Returns a specific comment from a post
+      parameters: 
+        - in: query
+          name: id
+          schema:
+            type: integer
+          description: Account id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Account'
+        '404': 
+          description: Item not found
+        '400':
+          description: 'Bad request' 
+  /post/:postId/comment/:commentId/reactions:
+    get:
+      tags:
+        - comments
+      summary: Returns all the reactions for a comment
+      parameters: 
+        - in: query
+          name: id
+          schema:
+            type: integer
+          description: Post id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Reaction'
+        '400':
+          description: Bad request
+        '404': 
+          description: Post not found
+  /post/:postId/comment/:commentId:
+    patch:
+      security:
+      - bearerAuth: []
+      tags: 
+        - comments
+      summary: Update a comment from a post 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePost'
+      responses:
+        '200':
+          description: Returns an updated post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdatePost'
+        '404': 
+          description: Item not found
+        '403':
+          description: 'Access denied' 
+  /comment/:id/reactions:
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - comments
+      summary: Set a reaction to the comment
+      requestBody: 
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reaction'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Post'
+        '400': 
+          description: Bad request
+        '404': 
+          description: Item not found
+        '403':
+          description: 'Access denied'
+  /post/:postId/comment/:id/:
+    delete:
+      security:
+      - bearerAuth: []
+      tags:
+        - comments
+      summary: Delete an specific comment from a post
+      parameters:
+        - in: query
+          name: id
+          schema: 
+            type: integer
+          description: Post id
+      responses:
+        '200':
+          description: Delete an specific comment from a post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+  /post/:postId/reports:
+    post:
+      security:
+      - bearerAuth: []
+      tags:
+        - reports
+      summary: Report a post
+      parameters:
+        - in: query
+          name: postId
+          schema:
+            type: integer
+          description: Post id
+      responses: 
+        '200': 
+          description: Create a new report for a post
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+  /post/:postId/comments/:commentId/reports:
+    post:
+      security:
+      - bearerAuth: []
+      tags:
+        - reports
+      summary: Report a comment from a post
+      parameters:
+        - in: query
+          name: postId
+          schema:
+            type: integer
+          description: Post id
+      responses: 
+        '200': 
+          description: Create a new report for a comment
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+components:
+  securitySchemes: 
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Login: 
+      type: object
+      required: 
+        - email
+        - password
+      properties:
+        email: 
+          type: string
+          example: johndoe@email.com
+        password:
+          type: string
+          example: johndoePassword987
+    Account:
+      type: object
+      required:
+        - id
+        - name
+        - lastname
+        - email
+        - password
+      properties:
+        id: 
+          type: number
+          example: 1
+        name: 
+          type: string
+          example: John
+        lastname:
+          type: string
+          example: Doe
+        email: 
+          type: string
+          example: johndoe@email.com
+        password:
+          type: string
+          example: johndoePassword987
+        role:
+          type: string
+          enum: [MODERATOR, USER]
+          example: USER
+        createdAt:
+          type: string
+          example: 2023-05-18T15:50:28.554Z
+        updatedAt:
+          type: string
+          example: 2023-05-18T15:50:28.554Z
+        isPublicEmail:
+          type: boolean
+          example: false
+        isPublicName:
+          type: boolean
+          example: false
+        posts: 
+          type: array
+          $ref: '#/components/schemas/Post'
+        comments: 
+          type: array
+          $ref: '#/components/schemas/Comment'
+    UpdateAccount: 
+      type: object
+      properties:
+        name: 
+          type: string
+          example: John
+        lastname:
+          type: string
+          example: Doe
+        email: 
+          type: string
+          example: johndoe@email.com
+        password:
+          type: string
+          example: johndoePassword987
+        createdAt:
+          type: string
+          example: 2023-05-18T15:50:28.554Z
+        updatedAt:
+          type: string
+          example: 2023-05-18T15:50:28.554Z
+    Post:
+      type: object
+      required: 
+        - id
+        - content
+        - authorId
+      properties:
+        id: 
+          type: string
+          example: 1
+        content:
+          type: string
+          example: Lorem ipsum dolor
+        status: 
+          type: string
+          enum: [PUBLISHED, DRAFT]
+          example: PUBLISHED
+        createdAt:
+          type: string
+          example: 2023-05-18T15:50:28.554Z
+        updatedAt:
+          type: string
+          example: 2023-05-18T15:50:28.554Z
+        authorId:
+          type: string
+          example: 1
+        reaction: 
+          type: array
+          example: [FUNNY, LIKE, DISLIKE]
+        comments: 
+          type: array
+          $ref: '#/components/schemas/Comment'
+        reports: 
+          type: array
+          $ref: '#/components/schemas/Report'
+    UpdatePost:
+      type: object
+      required:
+        - postId
+        - authorId
+      properties:
+        content:
+          type: string
+          example: Lorem ipsum dolor
+        status: 
+          type: string
+          enum: [PUBLISHED, DRAFT]
+          example: PUBLISHED
+        postId:
+          type: number
+          example: 1
+        authorId:
+          type: number
+          example: 1
+        createdAt:
+          type: string
+          example: 2023-05-18T15:50:28.554Z
+        updatedAt:
+          type: string
+          example: 2023-05-18T15:50:28.554Z
+    Comment:
+      type: object
+      required:
+        - postId
+        - authorId
+      properties:
+        content:
+          type: string
+          example: Lorem ipsum dolor
+        status: 
+          type: string
+          enum: [PUBLISHED, DRAFT]
+          example: PUBLISHED
+        postId:
+          type: number
+          example: 1
+        authorId:
+          type: number
+          example: 1
+        reaction: 
+          type: array
+          example: [FUNNY, LIKE, DISLIKE]
+        createdAt:
+          type: string
+          example: 2023-05-18T15:50:28.554Z
+        updatedAt:
+          type: string
+          example: 2023-05-18T15:50:28.554Z
+        reports: 
+          type: array
+          $ref: '#/components/schemas/Report'
+    UpdateComment: 
+      type: object
+      required:
+        - postId
+        - authorId
+      properties:
+        content:
+          type: string
+          example: Lorem ipsum dolor
+        status: 
+          type: string
+          enum: [PUBLISHED, DRAFT]
+          example: PUBLISHED
+        postId:
+          type: number
+          example: 1
+        authorId:
+          type: number
+          example: 1
+        createdAt:
+          type: string
+          example: 2023-05-18T15:50:28.554Z
+        updatedAt:
+          type: string
+          example: 2023-05-18T15:50:28.554Z
+    Report:
+      type: object
+      required:
+        - postId
+        - authorId
+        - description
+      properties:
+        id: 
+          type: number
+          example: 1
+        authorId: 
+          type: number
+          example: 1
+        description: 
+          type: string
+          example: Lorem ipsum 
+        createdAt:
+          type: string
+          example: 2023-05-18T15:50:28.554Z 
+    Reaction:
+      type: object
+      required: 
+        - type
+        - publicationId
+        - authorId
+      properties:
+        type: 
+          type: string
+          enum: [LIKE, DISLIKE, LOVE, ANGRY, FUNNY]
+          example: LIKE
+        publicactionId:
+          type: number
+          example: 1
+        authorId: 
+          type: number
+          example: 1
+        createdAt:
+          type: string
+          example: 2023-05-18T15:50:28.554Z 
