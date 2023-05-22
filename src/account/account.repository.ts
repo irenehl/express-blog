@@ -3,8 +3,8 @@ import bcrypt from 'bcrypt';
 import { CreateAccountDto } from './dtos/create-account.dto';
 import { BaseRepository } from '../common/base-repository';
 import { AccountDto } from './dtos/account.dto';
-import { IPagionation } from '../common/pagination-interface';
 import { UpdateAccountDto } from './dtos/update-account.dto';
+import { Pagination } from '../common/interfaces/pagination';
 
 export class AccountRepository extends BaseRepository<Account> {
     private readonly prismaClient: PrismaClient;
@@ -39,7 +39,7 @@ export class AccountRepository extends BaseRepository<Account> {
         );
     }
 
-    async account(
+    async getOne(
         query: Prisma.AccountWhereUniqueInput
     ): Promise<AccountDto | null> {
         return await this.prismaClient.account.findUnique({
@@ -51,6 +51,7 @@ export class AccountRepository extends BaseRepository<Account> {
                 name: true,
                 lastname: true,
                 email: true,
+                username: true,
                 role: true,
                 createdAt: true,
                 updatedAt: true,
@@ -61,7 +62,7 @@ export class AccountRepository extends BaseRepository<Account> {
     }
 
     async getAll(
-        params: IPagionation & {
+        params: Pagination & {
             cursor?: Prisma.AccountWhereUniqueInput;
             where?: Prisma.AccountWhereInput;
             orderBy?: Prisma.AccountOrderByWithAggregationInput;
@@ -81,6 +82,7 @@ export class AccountRepository extends BaseRepository<Account> {
                 lastname: true,
                 email: true,
                 role: true,
+                username: true,
                 createdAt: true,
                 updatedAt: true,
                 isPublicEmail: true,
@@ -89,14 +91,12 @@ export class AccountRepository extends BaseRepository<Account> {
         });
     }
 
-    async update(id: number, data: UpdateAccountDto): Promise<AccountDto> {
-        let hashedPassword;
-
-        data.password
-            ? (hashedPassword = await bcrypt.hash(
-                  data.password,
-                  +process.env.SALT! ?? 10
-              ))
+    async update(
+        id: number,
+        data: UpdateAccountDto
+    ): Promise<AccountDto | null> {
+        const hashedPassword = data.password
+            ? await bcrypt.hash(data.password, +process.env.SALT! ?? 10)
             : undefined;
 
         const account = await this.prismaClient.account.update({
@@ -113,10 +113,12 @@ export class AccountRepository extends BaseRepository<Account> {
     }
 
     async delete(id: number): Promise<AccountDto> {
-        return this.prismaClient.account.delete({
+        const account = await this.prismaClient.account.delete({
             where: {
                 id,
             },
         });
+
+        return this.exclude(account, ['password']);
     }
 }

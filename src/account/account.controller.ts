@@ -21,7 +21,10 @@ export class AccountController {
     }
 
     async getAll(req: Request, res: Response) {
-        const accounts = await this.accountService.getAll(req.query);
+        const accounts = await this.accountService.getAll({
+            page: Number(req.query.page ?? 1),
+            limit: Number(req.query.limit ?? 10),
+        });
 
         return res.status(200).json(accounts);
     }

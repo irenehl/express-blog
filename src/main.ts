@@ -1,3 +1,4 @@
+/// <reference types="./types/request.d.ts" />
 require('express-async-errors');
 import express from 'express';
 import baseRouter from './common/base-router';

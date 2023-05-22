@@ -16,6 +16,10 @@ router.patch(
     accountController.update.bind(accountController)
 );
 
-router.delete('/:id', accountController.delete.bind(accountController));
+router.delete(
+    '/:id',
+    passport.authenticate('jwt', { session: false }),
+    accountController.delete.bind(accountController)
+);
 
 export default router;
