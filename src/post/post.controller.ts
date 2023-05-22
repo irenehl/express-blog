@@ -21,26 +21,31 @@ export class PostController {
     }
 
     async getAll(req: Request, res: Response) {
-        return res.status(200).json(await this.postService.getAll(req.query));
+        return res.status(200).json(
+            await this.postService.getAll({
+                page: Number(req.query.page ?? 1),
+                limit: Number(req.query.limit ?? 10),
+            })
+        );
     }
 
-    async updatePost(req: any, res: Response) {
+    async updatePost(req: Request, res: Response) {
         return res
             .status(200)
             .json(
                 await this.postService.updatePost(
-                    +req.user.id,
+                    +req.user!.id,
                     +req.params.id,
                     req.body
                 )
             );
     }
 
-    async deletePost(req: any, res: Response) {
+    async deletePost(req: Request, res: Response) {
         return res
             .status(200)
             .json(
-                await this.postService.deletePost(+req.user.id, +req.params.id)
+                await this.postService.deletePost(+req.user!.id, +req.params.id)
             );
     }
 }

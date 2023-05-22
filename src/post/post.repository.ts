@@ -1,5 +1,5 @@
 import { Post, Prisma, PrismaClient } from '@prisma/client';
-import { IPagionation } from '../common/pagination-interface';
+import { Pagination } from '../common/interfaces/pagination';
 
 export class PostRepository {
     private readonly prismaClient: PrismaClient;
@@ -25,7 +25,7 @@ export class PostRepository {
     }
 
     async getAll(
-        params: IPagionation & {
+        params: Pagination & {
             cursor?: Prisma.PostWhereUniqueInput;
             where?: Prisma.PostWhereInput;
             orderBy?: Prisma.PostOrderByWithAggregationInput;
@@ -42,11 +42,7 @@ export class PostRepository {
         });
     }
 
-    async update(
-        authorId: number,
-        postId: number,
-        data: Prisma.PostUpdateInput
-    ): Promise<Post> {
+    async update(postId: number, data: Prisma.PostUpdateInput): Promise<Post> {
         return await this.prismaClient.post.update({
             where: {
                 id: postId,
@@ -63,6 +59,21 @@ export class PostRepository {
                 id: postId,
             },
         });
+    }
+
+    async deleteAllPostAndComments(authorId: number) {
+        await Promise.all([
+            this.prismaClient.post.deleteMany({
+                where: {
+                    authorId,
+                },
+            }),
+            this.prismaClient.comment.deleteMany({
+                where: {
+                    authorId,
+                },
+            }),
+        ]);
     }
 
     async belongsTo(authorId: number, postId: number) {
