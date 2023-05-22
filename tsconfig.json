@@ -6,6 +6,13 @@
         "esModuleInterop": true,
         "sourceMap": true,
         "outDir": "dist",
-        "forceConsistentCasingInFileNames": true
+        "forceConsistentCasingInFileNames": true,
+        "typeRoots": [
+            "./node_modules/@types",
+            "./src/types"
+        ],
+        "types": [
+            "express"
+        ]
     }
 }
