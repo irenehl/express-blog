@@ -6,13 +6,13 @@ datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
 }
-
 model Account {
     id            Int           @id @default(autoincrement())
     name          String        @db.VarChar(50)
     lastname      String        @db.VarChar(50)
     email         String        @unique
     password      String
+    username      String        @unique @db.VarChar(50)
     role          Role          @default(USER)
     createdAt     DateTime      @default(now()) @map("created_at")
     updatedAt     DateTime      @default(now()) @map("updated_at")
@@ -22,8 +22,8 @@ model Account {
     comments          Comment[]
     posts             Post[]
     reports           Report[]
-    likesOnComments   LikesOnComments[]
-    likesOnPosts      LikesOnPosts[]
+    reactionsOnComments        ReactionsOnComments[]
+    reactionsOnPosts          ReactionsOnPosts[]
 }
 
 model Comment {
@@ -41,7 +41,7 @@ model Comment {
     post        Post              @relation(fields: [postId], references: [id])
     postId      Int               @map("post_id")
 
-    likesOnComments LikesOnComments[]
+    ReactionsOnComments ReactionsOnComments[]
 }
 
 model Post {
@@ -56,8 +56,8 @@ model Post {
     author    Account       @relation(fields: [authorId], references: [id])
     authorId  Int           @map("author_id")
 
-    comments       Comment[]
-    likesOnPosts   LikesOnPosts[]
+    comments           Comment[]
+    ReactionsOnPosts   ReactionsOnPosts[]
 }
 
 model Report {
@@ -77,8 +77,10 @@ model Report {
     @@id([id, authorId, commentId, postId])
 }
 
-model LikesOnComments {
+model ReactionsOnComments {
     id            Int          @unique @default(autoincrement())
+
+    reaction       Reactions
 
     comment       Comment      @relation(fields: [commentId], references: [id])
     commentId     Int          @map("comment_id")
@@ -89,8 +91,10 @@ model LikesOnComments {
     @@id([id, authorId, commentId])
 }
 
-model LikesOnPosts {
+model ReactionsOnPosts {
     id             Int         @unique @default(autoincrement())
+
+    reaction       Reactions
 
     post           Post        @relation(fields: [postId], references: [id])
     postId         Int         @map("post_id")
@@ -109,4 +113,12 @@ enum ContentStatus {
 enum Role {
     MODERATOR
     USER
+}
+
+enum Reactions {
+    LIKE
+    DISLIKE
+    LOVE
+    ANGRY
+    FUNNY
 }
