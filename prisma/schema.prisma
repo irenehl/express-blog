@@ -33,7 +33,7 @@ model Comment {
     createdAt   DateTime          @default(now()) @map("created_at")
     updatedAt   DateTime          @default(now()) @map("updated_at")
 
-    reports     Report?
+    reports     Report[]
 
     author      Account           @relation(fields: [authorId], references: [id])
     authorId   Int                @map("author_id")
@@ -51,7 +51,7 @@ model Post {
     createdAt DateTime      @default(now()) @map("created_at")
     updatedAt DateTime      @default(now()) @map("updated_at")
 
-    reports   Report?
+    reports   Report[]
 
     author    Account       @relation(fields: [authorId], references: [id])
     authorId  Int           @map("author_id")
@@ -61,25 +61,21 @@ model Post {
 }
 
 model Report {
-    id            Int         @unique @default(autoincrement())
+    id            Int         @id @default(autoincrement())
     description   String
     createdAt     DateTime    @default(now()) @map("created_at")
 
     author        Account     @relation(fields: [authorId], references: [id])
     authorId      Int         @map("author_id")
 
-    comment       Comment     @relation(fields: [commentId], references: [id])
-    commentId     Int         @unique @map("comment_id")
+    comment       Comment?    @relation(fields: [commentId], references: [id])
+    commentId     Int?        @map("comment_id")
 
-    post          Post        @relation(fields: [postId], references: [id])
-    postId        Int         @unique @map("post_id")
-
-    @@id([id, authorId, commentId, postId])
+    post          Post?       @relation(fields: [postId], references: [id])
+    postId        Int?        @map("post_id")
 }
 
 model ReactionsOnComments {
-    id            Int          @unique @default(autoincrement())
-
     reaction       Reactions
 
     comment       Comment      @relation(fields: [commentId], references: [id])
@@ -88,12 +84,10 @@ model ReactionsOnComments {
     author        Account      @relation(fields: [authorId], references: [id])
     authorId      Int          @map("author_id")
 
-    @@id([id, authorId, commentId])
+    @@id([authorId, commentId])
 }
 
-model ReactionsOnPosts {
-    id             Int         @unique @default(autoincrement())
-
+model ReactionsOnPosts {    
     reaction       Reactions
 
     post           Post        @relation(fields: [postId], references: [id])
@@ -102,7 +96,7 @@ model ReactionsOnPosts {
     author         Account     @relation(fields: [authorId], references: [id])
     authorId       Int         @map("author_id")
 
-    @@id([id, postId, authorId])
+    @@id([postId, authorId])
 }
 
 enum ContentStatus {
@@ -121,4 +115,5 @@ enum Reactions {
     LOVE
     ANGRY
     FUNNY
+    NULL
 }
