@@ -43,6 +43,40 @@ export class CommentController {
             );
     }
 
+    async reactionOnComment(req: Request, res: Response) {
+        return res
+            .status(200)
+            .json(
+                await this.commentService.reactionOnComment(
+                    Number(req.user?.id),
+                    Number(req.params.commentId),
+                    req.body.reaction
+                )
+            );
+    }
+
+    async getReactions(req: Request, res: Response) {
+        return res
+            .status(200)
+            .json(
+                await this.commentService.getReactions(
+                    Number(req.params.commentId)
+                )
+            );
+    }
+
+    async createReport(req: Request, res: Response) {
+        return res
+            .status(200)
+            .json(
+                await this.commentService.reportComment(
+                    Number(req.user?.id),
+                    Number(req.params.commentId),
+                    req.body
+                )
+            );
+    }
+
     async deleteComment(req: Request, res: Response) {
         return res
             .status(200)

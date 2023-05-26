@@ -1,6 +1,8 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient, Reactions } from '@prisma/client';
 import { CommentDto } from './dto/comment.dto';
 import { Pagination } from '../common/interfaces/pagination';
+import { getReactionsEnum } from '../common/get-reactions';
+import { ReportDto } from '../common/dtos/report.dto';
 
 export class CommentRepository {
     private readonly prismaClient: PrismaClient;
@@ -37,7 +39,7 @@ export class CommentRepository {
         const { page, limit, cursor, where, orderBy } = params;
 
         return await this.prismaClient.comment.findMany({
-            skip: Number(page),
+            skip: Number(page - 1),
             take: Number(limit),
             cursor,
             orderBy,
@@ -50,17 +52,91 @@ export class CommentRepository {
     }
 
     async updateComment(
-        postId: number,
         commentId: number,
         data: Prisma.CommentUpdateInput
-    ) {
-        return await this.prismaClient.comment.updateMany({
+    ): Promise<CommentDto> {
+        return await this.prismaClient.comment.update({
             where: {
                 id: commentId,
-                postId,
             },
             data: {
                 ...data,
+            },
+        });
+    }
+
+    async reactionOnComment(
+        commentId: number,
+        authorId: number,
+        reaction: Reactions | 'NULL'
+    ) {
+        if (reaction === 'NULL') {
+            const hasReacted =
+                await this.prismaClient.reactionsOnComments.findUnique({
+                    where: {
+                        authorId_commentId: {
+                            commentId,
+                            authorId,
+                        },
+                    },
+                });
+
+            return hasReacted
+                ? this.prismaClient.reactionsOnComments.delete({
+                      where: {
+                          authorId_commentId: {
+                              commentId,
+                              authorId,
+                          },
+                      },
+                  })
+                : null;
+        }
+
+        return this.prismaClient.reactionsOnComments.upsert({
+            where: {
+                authorId_commentId: {
+                    authorId,
+                    commentId,
+                },
+            },
+            create: {
+                authorId,
+                commentId,
+                reaction: getReactionsEnum(reaction),
+            },
+            update: {
+                reaction: getReactionsEnum(reaction),
+            },
+        });
+    }
+
+    async getReactions(commentId: number) {
+        return this.prismaClient.reactionsOnComments.findMany({
+            where: {
+                commentId,
+            },
+        });
+    }
+
+    async createReport(
+        authorId: number,
+        commentId: number,
+        data: Prisma.ReportCreateInput
+    ): Promise<ReportDto> {
+        return await this.prismaClient.report.create({
+            data: {
+                description: data.description,
+                author: {
+                    connect: {
+                        id: authorId,
+                    },
+                },
+                comment: {
+                    connect: {
+                        id: commentId,
+                    },
+                },
             },
         });
     }

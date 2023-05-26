@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, Reactions } from '@prisma/client';
 import { AccountService } from '../account/acount.service';
 import { Pagination } from '../common/interfaces/pagination';
 import { PostService } from '../post/post.service';
@@ -6,6 +6,7 @@ import { CommentRepository } from './comment.repository';
 import { CommentDto } from './dto/comment.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { HttpError } from '../common/http-error';
+import { ReportDto } from '../common/dtos/report.dto';
 
 export class CommentService {
     private readonly commentRepository: CommentRepository;
@@ -74,15 +75,40 @@ export class CommentService {
 
         const updatedComment = await this.commentRepository.updateComment(
             commentId,
-            postId,
             data
         );
 
         if (!updatedComment) throw new HttpError(400, 'Something went wrong');
 
-        console.log(commentId);
+        return updatedComment;
+    }
 
-        return await this.commentRepository.getOne({ id: commentId });
+    async reactionOnComment(
+        authorId: number,
+        commentId: number,
+        reaction: Reactions
+    ) {
+        return await this.commentRepository.reactionOnComment(
+            commentId,
+            authorId,
+            reaction
+        );
+    }
+
+    async getReactions(commendId: number) {
+        return this.commentRepository.getReactions(commendId);
+    }
+
+    async reportComment(
+        authorId: number,
+        commentId: number,
+        data: Prisma.ReportCreateInput
+    ): Promise<ReportDto> {
+        return await this.commentRepository.createReport(
+            authorId,
+            commentId,
+            data
+        );
     }
 
     async deleteComment(
