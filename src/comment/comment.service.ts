@@ -83,6 +83,10 @@ export class CommentService {
         commentId: number,
         reaction: Reactions
     ) {
+        const comment = await this.commentRepository.getOne({ id: commentId });
+
+        if (!comment) throw new HttpError(404, 'Comment not found');
+
         return await this.commentRepository.reactionOnComment(
             commentId,
             authorId,
@@ -99,6 +103,10 @@ export class CommentService {
         commentId: number,
         data: Prisma.ReportCreateInput
     ): Promise<ReportDto> {
+        const comment = await this.commentRepository.getOne({ id: commentId });
+
+        if (!comment) throw new HttpError(404, 'Comment not found');
+
         return await this.commentRepository.createReport(
             authorId,
             commentId,
@@ -114,9 +122,6 @@ export class CommentService {
             authorId,
             commentId
         );
-        console.log(authorId);
-
-        console.log(isAuthor);
 
         if (!isAuthor)
             throw new HttpError(403, 'Comment does not belong to account');
