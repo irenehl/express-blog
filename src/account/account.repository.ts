@@ -71,8 +71,8 @@ export class AccountRepository extends BaseRepository<Account> {
         const { page, limit, cursor, where, orderBy } = params;
 
         return await this.prismaClient.account.findMany({
-            skip: +page!,
-            take: +limit!,
+            skip: Number(page - 1),
+            take: Number(limit),
             cursor,
             where,
             orderBy,

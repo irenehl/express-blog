@@ -38,7 +38,6 @@ export class AccountService {
 
     async update(id: number, data: UpdateAccountDto): Promise<AccountDto> {
         const accountExists = await this.accountRepository.getOne({ id });
-        // console.log(accountExists);
 
         if (!accountExists) throw new HttpError(404, 'Account not found');
 
