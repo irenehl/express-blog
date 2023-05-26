@@ -58,7 +58,6 @@ export class CommentService {
     async updateComment(
         authorId: number,
         commentId: number,
-        postId: number,
         data: Prisma.CommentUpdateInput
     ): Promise<CommentDto | null> {
         const isAuthor = await this.commentRepository.belongsTo(
@@ -68,10 +67,6 @@ export class CommentService {
 
         if (!isAuthor)
             throw new HttpError(403, 'Comment does not belong to account');
-
-        const post = await this.postService.getPost({ id: postId });
-
-        if (!post) throw new HttpError(404, 'Post not found');
 
         const updatedComment = await this.commentRepository.updateComment(
             commentId,
@@ -113,20 +108,18 @@ export class CommentService {
 
     async deleteComment(
         commentId: number,
-        authorId: number,
-        postId: number
+        authorId: number
     ): Promise<CommentDto> {
         const isAuthor = await this.commentRepository.belongsTo(
             authorId,
             commentId
         );
+        console.log(authorId);
+
+        console.log(isAuthor);
 
         if (!isAuthor)
             throw new HttpError(403, 'Comment does not belong to account');
-
-        const post = await this.postService.getPost({ id: postId });
-
-        if (!post) throw new HttpError(404, 'Post not found');
 
         return await this.commentRepository.delete(commentId);
     }

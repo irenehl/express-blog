@@ -36,8 +36,7 @@ export class CommentController {
             .json(
                 await this.commentService.updateComment(
                     +req.user!.id,
-                    +req.params.commentId,
-                    +req.params.postId,
+                    +req.params.id,
                     req.body
                 )
             );
@@ -49,7 +48,7 @@ export class CommentController {
             .json(
                 await this.commentService.reactionOnComment(
                     Number(req.user?.id),
-                    Number(req.params.commentId),
+                    Number(req.params.id),
                     req.body.reaction
                 )
             );
@@ -59,9 +58,7 @@ export class CommentController {
         return res
             .status(200)
             .json(
-                await this.commentService.getReactions(
-                    Number(req.params.commentId)
-                )
+                await this.commentService.getReactions(Number(req.params.id))
             );
     }
 
@@ -71,7 +68,7 @@ export class CommentController {
             .json(
                 await this.commentService.reportComment(
                     Number(req.user?.id),
-                    Number(req.params.commentId),
+                    Number(req.params.id),
                     req.body
                 )
             );
@@ -82,9 +79,8 @@ export class CommentController {
             .status(200)
             .json(
                 await this.commentService.deleteComment(
-                    +req.params.commentId,
-                    +req.user!.id,
-                    +req.params.postId
+                    +req.params.id,
+                    +req.user!.id
                 )
             );
     }

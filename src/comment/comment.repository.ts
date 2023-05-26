@@ -158,7 +158,7 @@ export class CommentRepository {
     }
 
     async belongsTo(authorId: number, commentId: number) {
-        const comment = await this.prismaClient.comment.findFirst({
+        const comment = await this.prismaClient.comment.findFirstOrThrow({
             where: {
                 author: {
                     id: authorId,
