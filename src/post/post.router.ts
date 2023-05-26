@@ -13,16 +13,31 @@ router.post(
     postController.create.bind(postController)
 );
 router.post(
+    '/:id/reports',
+    passport.authenticate('jwt', { session: false }),
+    postController.createReport.bind(postController)
+);
+router.post(
     '/:id/comments',
     passport.authenticate('jwt', { session: false }),
     commentController.create.bind(commentController)
 );
+router.post(
+    '/:postId/comments/:commentId/reports',
+    passport.authenticate('jwt', { session: false }),
+    commentController.createReport.bind(commentController)
+);
 
-router.get('/:id', postController.getPost.bind(postController));
 router.get('/', postController.getAll.bind(postController));
+router.get('/:id', postController.getPost.bind(postController));
+router.get('/:id/reactions', postController.getReaction.bind(postController));
 router.get(
     '/:id/comments',
     commentController.getComments.bind(commentController)
+);
+router.get(
+    '/:postId/comments/:commentId/reactions',
+    commentController.getReactions.bind(commentController)
 );
 
 router.patch(
@@ -31,9 +46,19 @@ router.patch(
     postController.updatePost.bind(postController)
 );
 router.patch(
+    '/:id/reactions',
+    passport.authenticate('jwt', { session: false }),
+    postController.reactionOnPost.bind(postController)
+);
+router.patch(
     '/:postId/comments/:commentId',
     passport.authenticate('jwt', { session: false }),
     commentController.updateComment.bind(commentController)
+);
+router.patch(
+    '/:postId/comments/:commentId/reactions',
+    passport.authenticate('jwt', { session: false }),
+    commentController.reactionOnComment.bind(commentController)
 );
 
 router.delete(

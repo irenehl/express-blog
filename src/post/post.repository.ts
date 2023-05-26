@@ -1,5 +1,7 @@
-import { Post, Prisma, PrismaClient } from '@prisma/client';
+import { Post, Prisma, PrismaClient, Reactions } from '@prisma/client';
 import { Pagination } from '../common/interfaces/pagination';
+import { getReactionsEnum } from '../common/get-reactions';
+import { ReportDto } from '../common/dtos/report.dto';
 
 export class PostRepository {
     private readonly prismaClient: PrismaClient;
@@ -49,6 +51,82 @@ export class PostRepository {
             },
             data: {
                 ...data,
+            },
+        });
+    }
+
+    async reactionOnPost(
+        postId: number,
+        authorId: number,
+        reaction: Reactions | 'NULL'
+    ) {
+        if (reaction === 'NULL') {
+            const hasReacted =
+                await this.prismaClient.reactionsOnPosts.findUnique({
+                    where: {
+                        postId_authorId: {
+                            postId,
+                            authorId,
+                        },
+                    },
+                });
+
+            return hasReacted
+                ? this.prismaClient.reactionsOnPosts.delete({
+                      where: {
+                          postId_authorId: {
+                              postId,
+                              authorId,
+                          },
+                      },
+                  })
+                : null;
+        }
+
+        return this.prismaClient.reactionsOnPosts.upsert({
+            where: {
+                postId_authorId: {
+                    postId,
+                    authorId,
+                },
+            },
+            create: {
+                authorId,
+                postId,
+                reaction: getReactionsEnum(reaction),
+            },
+            update: {
+                reaction: getReactionsEnum(reaction),
+            },
+        });
+    }
+
+    async getReactions(postId: number) {
+        return this.prismaClient.reactionsOnPosts.findMany({
+            where: {
+                postId,
+            },
+        });
+    }
+
+    async createReport(
+        authorId: number,
+        postId: number,
+        data: Prisma.ReportCreateInput
+    ): Promise<ReportDto> {
+        return await this.prismaClient.report.create({
+            data: {
+                description: data.description,
+                author: {
+                    connect: {
+                        id: authorId,
+                    },
+                },
+                post: {
+                    connect: {
+                        id: postId,
+                    },
+                },
             },
         });
     }

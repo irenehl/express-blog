@@ -41,6 +41,36 @@ export class PostController {
             );
     }
 
+    async reactionOnPost(req: Request, res: Response) {
+        return res
+            .status(200)
+            .json(
+                await this.postService.reactionOnPost(
+                    Number(req.user?.id),
+                    Number(req.params.id),
+                    req.body.reaction
+                )
+            );
+    }
+
+    async getReaction(req: Request, res: Response) {
+        return res
+            .status(200)
+            .json(await this.postService.getReactions(Number(req.params.id)));
+    }
+
+    async createReport(req: Request, res: Response) {
+        return res
+            .status(200)
+            .json(
+                await this.postService.createReport(
+                    Number(req.user?.id),
+                    Number(req.params.id),
+                    req.body
+                )
+            );
+    }
+
     async deletePost(req: Request, res: Response) {
         return res
             .status(200)
