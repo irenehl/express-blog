@@ -6,95 +6,86 @@ datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
 }
-model Account {
-    id            Int           @id @default(autoincrement())
-    name          String        @db.VarChar(50)
-    lastname      String        @db.VarChar(50)
-    email         String        @unique
-    password      String
-    username      String        @unique @db.VarChar(50)
-    role          Role          @default(USER)
-    createdAt     DateTime      @default(now()) @map("created_at")
-    updatedAt     DateTime      @default(now()) @map("updated_at")
-    isPublicEmail Boolean       @default(false) @map("is_public_email")
-    isPublicName  Boolean       @default(false) @map("is_public_name")
 
-    comments          Comment[]
-    posts             Post[]
-    reports           Report[]
-    reactionsOnComments        ReactionsOnComments[]
-    reactionsOnPosts          ReactionsOnPosts[]
+model Account {
+    id             Int      @id @default(autoincrement())
+    name           String   @db.VarChar(50)
+    lastname       String   @db.VarChar(50)
+    email          String   @unique
+    password       String
+    username       String   @unique @db.VarChar(50)
+    role           Role     @default(USER)
+    
+    createdAt      DateTime @default(now()) @map("created_at")
+    updatedAt      DateTime @default(now()) @map("updated_at")
+
+    isPublicEmail  Boolean  @default(false) @map("is_public_email")
+    isPublicName   Boolean  @default(false) @map("is_public_name")
+
+    recoveryToken  String?  @db.Uuid @map("recovery_token")
+
+    comments            Comment[]
+    posts               Post[]
+    reports             Report[]
+    reactionsOnComments ReactionsOnComments[]
+    reactionsOnPosts    ReactionsOnPosts[]
 }
 
 model Comment {
-    id          Int               @id @unique @default(autoincrement())
-    content     String
-    status      ContentStatus     @default(PUBLISHED)
-    createdAt   DateTime          @default(now()) @map("created_at")
-    updatedAt   DateTime          @default(now()) @map("updated_at")
-
-    reports     Report[]
-
-    author      Account           @relation(fields: [authorId], references: [id])
-    authorId   Int                @map("author_id")
-
-    post        Post              @relation(fields: [postId], references: [id])
-    postId      Int               @map("post_id")
-
+    id                  Int                   @id @unique @default(autoincrement())
+    content             String
+    status              ContentStatus         @default(PUBLISHED)
+    createdAt           DateTime              @default(now()) @map("created_at")
+    updatedAt           DateTime              @default(now()) @map("updated_at")
+    reports             Report[]
+    author              Account               @relation(fields: [authorId], references: [id])
+    authorId            Int                   @map("author_id")
+    post                Post                  @relation(fields: [postId], references: [id])
+    postId              Int                   @map("post_id")
     ReactionsOnComments ReactionsOnComments[]
 }
 
 model Post {
-    id        Int           @id @unique @default(autoincrement())
-    content   String
-    status    ContentStatus @default(PUBLISHED)
-    createdAt DateTime      @default(now()) @map("created_at")
-    updatedAt DateTime      @default(now()) @map("updated_at")
-
-    reports   Report[]
-
-    author    Account       @relation(fields: [authorId], references: [id])
-    authorId  Int           @map("author_id")
-
-    comments           Comment[]
-    ReactionsOnPosts   ReactionsOnPosts[]
+    id               Int                @id @unique @default(autoincrement())
+    content          String
+    status           ContentStatus      @default(PUBLISHED)
+    createdAt        DateTime           @default(now()) @map("created_at")
+    updatedAt        DateTime           @default(now()) @map("updated_at")
+    reports          Report[]
+    author           Account            @relation(fields: [authorId], references: [id])
+    authorId         Int                @map("author_id")
+    comments         Comment[]
+    ReactionsOnPosts ReactionsOnPosts[]
 }
 
 model Report {
-    id            Int         @id @default(autoincrement())
-    description   String
-    createdAt     DateTime    @default(now()) @map("created_at")
-
-    author        Account     @relation(fields: [authorId], references: [id])
-    authorId      Int         @map("author_id")
-
-    comment       Comment?    @relation(fields: [commentId], references: [id])
-    commentId     Int?        @map("comment_id")
-
-    post          Post?       @relation(fields: [postId], references: [id])
-    postId        Int?        @map("post_id")
+    id          Int      @id @default(autoincrement())
+    description String
+    createdAt   DateTime @default(now()) @map("created_at")
+    author      Account  @relation(fields: [authorId], references: [id])
+    authorId    Int      @map("author_id")
+    comment     Comment? @relation(fields: [commentId], references: [id])
+    commentId   Int?     @map("comment_id")
+    post        Post?    @relation(fields: [postId], references: [id])
+    postId      Int?     @map("post_id")
 }
 
 model ReactionsOnComments {
-    reaction       Reactions
-
-    comment       Comment      @relation(fields: [commentId], references: [id])
-    commentId     Int          @map("comment_id")
-
-    author        Account      @relation(fields: [authorId], references: [id])
-    authorId      Int          @map("author_id")
+    reaction  Reactions
+    comment   Comment   @relation(fields: [commentId], references: [id])
+    commentId Int       @map("comment_id")
+    author    Account   @relation(fields: [authorId], references: [id])
+    authorId  Int       @map("author_id")
 
     @@id([authorId, commentId])
 }
 
-model ReactionsOnPosts {    
-    reaction       Reactions
-
-    post           Post        @relation(fields: [postId], references: [id])
-    postId         Int         @map("post_id")
-
-    author         Account     @relation(fields: [authorId], references: [id])
-    authorId       Int         @map("author_id")
+model ReactionsOnPosts {
+    reaction Reactions
+    post     Post      @relation(fields: [postId], references: [id])
+    postId   Int       @map("post_id")
+    author   Account   @relation(fields: [authorId], references: [id])
+    authorId Int       @map("author_id")
 
     @@id([postId, authorId])
 }
