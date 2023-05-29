@@ -15,7 +15,9 @@
         "seed": "ts-node --compiler-options '{\"module\": \"CommonJS\"}' \"prisma/seed.ts\""
     },
     "dependencies": {
+        "@aws-sdk/client-ses": "^3.341.0",
         "@prisma/client": "^4.14.0",
+        "aws-sdk": "^2.1385.0",
         "eslint-plugin-prettier": "^4.2.1",
         "express": "^4.18.2",
         "express-async-errors": "^3.1.1",

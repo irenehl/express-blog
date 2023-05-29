@@ -19,7 +19,7 @@ export class AuthRepository extends BaseRepository<Account> {
         });
 
         const isValid = account
-            ? bcrypt.compare(password, account?.password)
+            ? await bcrypt.compare(password, account?.password)
             : false;
 
         if (isValid)
@@ -33,5 +33,11 @@ export class AuthRepository extends BaseRepository<Account> {
             ]);
 
         return null;
+    }
+
+    async validateRecovery(recoveryToken: string) {
+        return this.prismaClient.account.findFirst({
+            where: { recoveryToken },
+        });
     }
 }

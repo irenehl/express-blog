@@ -15,9 +15,10 @@ export class AccountRepository extends BaseRepository<Account> {
     }
 
     async createAccount(dto: CreateAccountDto): Promise<AccountDto | null> {
-        const alreadyExists = await this.prismaClient.account.findUnique({
+        const alreadyExists = await this.prismaClient.account.findFirst({
             where: {
                 email: dto.email,
+                username: dto.username,
             },
         });
 

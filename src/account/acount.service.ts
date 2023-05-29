@@ -6,20 +6,33 @@ import { GetAccountDto } from './dtos/get-account.dto';
 import { UpdateAccountDto } from './dtos/update-account.dto';
 import { Pagination } from '../common/interfaces/pagination';
 import { PostRepository } from '../post/post.repository';
+import { MailService } from '../mail/mail.service';
+
+import welcomeHtml from '../templates/welcome.html';
 
 export class AccountService {
     private readonly accountRepository: AccountRepository;
     private readonly postRepository: PostRepository;
+    private readonly mailService: MailService;
 
     constructor() {
         this.accountRepository = new AccountRepository();
         this.postRepository = new PostRepository();
+        this.mailService = new MailService();
     }
 
     async createUser(data: Prisma.AccountCreateInput): Promise<AccountDto> {
         const account = await this.accountRepository.createAccount(data);
 
         if (!account) throw new HttpError(409, 'User already exists');
+
+        await this.mailService.sendEmail({
+            htmlTemplate: welcomeHtml,
+            toAddresses: [account.email],
+            subject: 'Thanks for registering',
+            textReplacer: (htmlData) =>
+                htmlData.replaceAll('USERNAME', account.username),
+        });
 
         return account;
     }
