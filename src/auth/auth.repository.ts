@@ -6,9 +6,9 @@ import { BaseRepository } from '../common/base-repository';
 export class AuthRepository extends BaseRepository<Account> {
     private readonly prismaClient: PrismaClient;
 
-    constructor() {
+    constructor(prismaClient: PrismaClient) {
         super();
-        this.prismaClient = new PrismaClient();
+        this.prismaClient = prismaClient;
     }
 
     async authorize(query: Prisma.AccountWhereUniqueInput, password: string) {
@@ -22,17 +22,16 @@ export class AuthRepository extends BaseRepository<Account> {
             ? await bcrypt.compare(password, account?.password)
             : false;
 
-        if (isValid)
-            return this.exclude(account!, [
-                'name',
-                'email',
-                'password',
-                'lastname',
-                'createdAt',
-                'updatedAt',
-            ]);
-
-        return null;
+        return isValid
+            ? this.exclude(account!, [
+                  'name',
+                  'email',
+                  'password',
+                  'lastname',
+                  'createdAt',
+                  'updatedAt',
+              ])
+            : null;
     }
 
     async validateRecovery(recoveryToken: string) {

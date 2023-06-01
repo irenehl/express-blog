@@ -1,11 +1,12 @@
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
+import prisma from '../config/prisma.client';
 
 export class AuthController {
     private readonly authService: AuthService;
 
     constructor() {
-        this.authService = new AuthService();
+        this.authService = new AuthService(prisma);
     }
 
     async login(req: Request, res: Response) {
