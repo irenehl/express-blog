@@ -1,3 +1,10 @@
 import { Account } from '@prisma/client';
 
-export type AccountDto = Omit<Account, 'password' | 'recoveryToken'>;
+export type AccountDto = Omit<
+    Account,
+    | 'password'
+    | 'recoveryToken'
+    | 'createdAt'
+    | 'updatedAt'
+    | 'verifyEmailToken'
+>;
