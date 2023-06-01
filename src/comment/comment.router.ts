@@ -15,6 +15,10 @@ router.get(
     '/:id/reactions',
     commentController.getReactions.bind(commentController)
 );
+router.get(
+    '/:id/reports',
+    commentController.getReports.bind(commentController)
+);
 
 router.patch(
     '/:id',

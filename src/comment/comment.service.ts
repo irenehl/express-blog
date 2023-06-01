@@ -1,4 +1,4 @@
-import { Prisma, Reactions } from '@prisma/client';
+import { Prisma, PrismaClient, Reactions } from '@prisma/client';
 import { AccountService } from '../account/acount.service';
 import { Pagination } from '../common/interfaces/pagination';
 import { PostService } from '../post/post.service';
@@ -7,16 +7,20 @@ import { CommentDto } from './dto/comment.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { HttpError } from '../common/http-error';
 import { ReportDto } from '../common/dtos/report.dto';
+import { MailService } from '../mail/mail.service';
+import commentReportHtml from '../templates/comment-report.html';
 
 export class CommentService {
     private readonly commentRepository: CommentRepository;
     private readonly accountService: AccountService;
     private readonly postService: PostService;
+    private readonly mailService: MailService;
 
-    constructor() {
-        this.commentRepository = new CommentRepository();
-        this.accountService = new AccountService();
-        this.postService = new PostService();
+    constructor(prismaClient: PrismaClient) {
+        this.commentRepository = new CommentRepository(prismaClient);
+        this.accountService = new AccountService(prismaClient);
+        this.postService = new PostService(prismaClient);
+        this.mailService = new MailService();
     }
 
     async createComment(
@@ -24,7 +28,7 @@ export class CommentService {
         postId: number,
         data: CreateCommentDto
     ): Promise<CommentDto> {
-        const account = await this.accountService.getUser({ id: accountId });
+        const account = await this.accountService.getAccount({ id: accountId });
         const post = await this.postService.getPost({ id: postId });
 
         return this.commentRepository.create({
@@ -107,25 +111,66 @@ export class CommentService {
 
         if (!comment) throw new HttpError(404, 'Comment not found');
 
-        return await this.commentRepository.createReport(
+        const reportCreated = await this.commentRepository.createReport(
             authorId,
             commentId,
             data
         );
+
+        // await this.mailService.sendEmail({
+        //     htmlTemplate: commentReportHtml,
+        //     subject: 'Comment reported',
+        //     toAddresses: await this.accountService.getAccountEmail(),
+        //     textReplacer: (htmlData) =>
+        //         htmlData.replaceAll(
+        //             'COMMENT',
+        //             `${process.env.HOST}/api/posts/${comment.postId}/comments/${commentId}`
+        //         ),
+        // });
+
+        return reportCreated;
+    }
+
+    async getReports(accountId: number, commendId: number) {
+        const comment = await this.commentRepository.getOne({ id: commendId });
+
+        if (!comment) throw new HttpError(404, 'Comment not found');
+
+        const account = await this.accountService.getAccount({
+            id: accountId,
+        });
+
+        if (account?.role !== 'MODERATOR')
+            throw new HttpError(403, 'Forbidden');
+
+        return this.commentRepository.getReports(commendId);
     }
 
     async deleteComment(
         commentId: number,
-        authorId: number
+        accountId: number
     ): Promise<CommentDto> {
+        let canDelete = true;
+
         const isAuthor = await this.commentRepository.belongsTo(
-            authorId,
+            accountId,
             commentId
         );
 
-        if (!isAuthor)
-            throw new HttpError(403, 'Comment does not belong to account');
+        if (!isAuthor) {
+            const account = await this.accountService.getAccount({
+                id: accountId,
+            });
+
+            if (account?.role !== 'MODERATOR') canDelete = false;
+        }
+
+        if (!canDelete) throw new HttpError(403, 'Forbidden');
 
         return await this.commentRepository.delete(commentId);
+    }
+
+    async deleteAllComments(postId: number) {
+        return await this.commentRepository.deleteAllComments(postId);
     }
 }

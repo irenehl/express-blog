@@ -7,8 +7,8 @@ import { ReportDto } from '../common/dtos/report.dto';
 export class CommentRepository {
     private readonly prismaClient: PrismaClient;
 
-    constructor() {
-        this.prismaClient = new PrismaClient();
+    constructor(prismaClient: PrismaClient) {
+        this.prismaClient = prismaClient;
     }
 
     async create(data: Prisma.CommentCreateInput): Promise<CommentDto> {
@@ -54,7 +54,15 @@ export class CommentRepository {
     async updateComment(
         commentId: number,
         data: Prisma.CommentUpdateInput
-    ): Promise<CommentDto> {
+    ): Promise<CommentDto | null> {
+        const exists = await this.prismaClient.comment.findUnique({
+            where: {
+                id: 20000,
+            },
+        });
+
+        if (!exists) return null;
+
         return await this.prismaClient.comment.update({
             where: {
                 id: commentId,
@@ -141,6 +149,14 @@ export class CommentRepository {
         });
     }
 
+    async getReports(postId: number): Promise<ReportDto[]> {
+        return await this.prismaClient.report.findMany({
+            where: {
+                postId,
+            },
+        });
+    }
+
     async delete(commentId: number): Promise<CommentDto> {
         return this.prismaClient.comment.delete({
             where: {
@@ -158,7 +174,7 @@ export class CommentRepository {
     }
 
     async belongsTo(authorId: number, commentId: number) {
-        const comment = await this.prismaClient.comment.findFirstOrThrow({
+        const comment = await this.prismaClient.comment.findFirst({
             where: {
                 author: {
                     id: authorId,
