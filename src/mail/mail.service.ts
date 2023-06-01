@@ -1,5 +1,3 @@
-import fs from 'fs/promises';
-
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 
 interface MailParams {
