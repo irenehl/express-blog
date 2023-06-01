@@ -1,23 +1,24 @@
 import { Request, Response } from 'express';
 import { AccountService } from './acount.service';
+import prisma from '../config/prisma.client';
 
 export class AccountController {
     private readonly accountService: AccountService;
 
     constructor() {
-        this.accountService = new AccountService();
+        this.accountService = new AccountService(prisma);
     }
 
-    async createUser(req: Request, res: Response) {
-        const user = await this.accountService.createUser(req.body);
+    async createAccount(req: Request, res: Response) {
+        const account = await this.accountService.createAccount(req.body);
 
-        return res.status(201).json(user);
+        return res.status(201).json(account);
     }
 
-    async getUser(req: Request, res: Response) {
+    async getAccount(req: Request, res: Response) {
         return res
             .status(200)
-            .json(await this.accountService.getUser({ id: +req.params.id }));
+            .json(await this.accountService.getAccount({ id: +req.params.id }));
     }
 
     async getAll(req: Request, res: Response) {

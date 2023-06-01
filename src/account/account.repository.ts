@@ -9,9 +9,9 @@ import { Pagination } from '../common/interfaces/pagination';
 export class AccountRepository extends BaseRepository<Account> {
     private readonly prismaClient: PrismaClient;
 
-    constructor() {
+    constructor(prismaClient: PrismaClient) {
         super();
-        this.prismaClient = new PrismaClient();
+        this.prismaClient = prismaClient;
     }
 
     async createAccount(dto: CreateAccountDto): Promise<AccountDto | null> {
@@ -26,7 +26,7 @@ export class AccountRepository extends BaseRepository<Account> {
 
         const hashedPassword = await bcrypt.hash(
             dto.password,
-            +(process.env.SALT ?? 10)
+            +process.env.SALT!
         );
 
         return this.exclude(
@@ -58,6 +58,7 @@ export class AccountRepository extends BaseRepository<Account> {
                 updatedAt: true,
                 isPublicEmail: true,
                 isPublicName: true,
+                verifyEmailToken: true,
             },
         });
     }
@@ -88,6 +89,15 @@ export class AccountRepository extends BaseRepository<Account> {
                 updatedAt: true,
                 isPublicEmail: true,
                 isPublicName: true,
+                verifyEmailToken: true,
+            },
+        });
+    }
+
+    async getAccountEmail(): Promise<AccountDto[]> {
+        return await this.prismaClient.account.findMany({
+            where: {
+                role: 'MODERATOR',
             },
         });
     }
@@ -96,8 +106,16 @@ export class AccountRepository extends BaseRepository<Account> {
         id: number,
         data: UpdateAccountDto
     ): Promise<AccountDto | null> {
+        const alreadyExists = await this.prismaClient.account.findUnique({
+            where: {
+                id,
+            },
+        });
+
+        if (!alreadyExists) return null;
+
         const hashedPassword = data.password
-            ? await bcrypt.hash(data.password, +process.env.SALT! ?? 10)
+            ? await bcrypt.hash(data.password, +process.env.SALT!)
             : undefined;
 
         const account = await this.prismaClient.account.update({
@@ -110,7 +128,12 @@ export class AccountRepository extends BaseRepository<Account> {
             },
         });
 
-        return this.exclude(account, ['password']);
+        return this.exclude(account, [
+            'password',
+            'updatedAt',
+            'createdAt',
+            'verifyEmailToken',
+        ]);
     }
 
     async delete(id: number): Promise<AccountDto> {

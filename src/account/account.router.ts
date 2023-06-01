@@ -5,9 +5,9 @@ import passport from 'passport';
 const router = Router();
 const accountController = new AccountController();
 
-router.post('/', accountController.createUser.bind(accountController));
+router.post('/', accountController.createAccount.bind(accountController));
 
-router.get('/:id', accountController.getUser.bind(accountController));
+router.get('/:id', accountController.getAccount.bind(accountController));
 router.get('/', accountController.getAll.bind(accountController));
 
 router.patch(
