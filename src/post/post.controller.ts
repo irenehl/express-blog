@@ -1,3 +1,4 @@
+import prisma from '../config/prisma.client';
 import { PostService } from './post.service';
 import { Request, Response } from 'express';
 
@@ -5,7 +6,7 @@ export class PostController {
     private readonly postService: PostService;
 
     constructor() {
-        this.postService = new PostService();
+        this.postService = new PostService(prisma);
     }
 
     async create(req: any, res: Response) {
@@ -59,14 +60,25 @@ export class PostController {
             .json(await this.postService.getReactions(Number(req.params.id)));
     }
 
-    async createReport(req: Request, res: Response) {
+    async reportPost(req: Request, res: Response) {
         return res
             .status(200)
             .json(
-                await this.postService.createReport(
+                await this.postService.reportPost(
                     Number(req.user?.id),
                     Number(req.params.id),
                     req.body
+                )
+            );
+    }
+
+    async getReports(req: Request, res: Response) {
+        return res
+            .status(200)
+            .json(
+                await this.postService.getReports(
+                    Number(req.user?.id),
+                    Number(req.params.id)
                 )
             );
     }

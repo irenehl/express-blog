@@ -1,26 +1,29 @@
-import { Prisma, Reactions } from '@prisma/client';
+import { Prisma, PrismaClient, Reactions } from '@prisma/client';
 import { PostRepository } from './post.repository';
 import { CreatePostDto } from './dto/create-post.dto';
 import { AccountService } from '../account/acount.service';
 import { HttpError } from '../common/http-error';
 import { PostDto } from './dto/post.dto';
 import { Pagination } from '../common/interfaces/pagination';
-import { CommentRepository } from '../comment/comment.repository';
 import { ReportDto } from '../common/dtos/report.dto';
+import { MailService } from '../mail/mail.service';
+import { CommentService } from '../comment/comment.service';
 
 export class PostService {
     private readonly postRepository: PostRepository;
     private readonly accountService: AccountService;
-    private readonly commentRepository: CommentRepository;
+    private readonly commentService: CommentService;
+    private readonly mailService: MailService;
 
-    constructor() {
-        this.postRepository = new PostRepository();
-        this.accountService = new AccountService();
-        this.commentRepository = new CommentRepository();
+    constructor(prismaClient: PrismaClient) {
+        this.postRepository = new PostRepository(prismaClient);
+        this.accountService = new AccountService(prismaClient);
+        this.commentService = new CommentService(prismaClient);
+        this.mailService = new MailService();
     }
 
     async createPost(accountId: number, data: CreatePostDto): Promise<PostDto> {
-        const account = await this.accountService.getUser({ id: accountId });
+        const account = await this.accountService.getAccount({ id: accountId });
 
         return this.postRepository.create({
             author: {
@@ -33,7 +36,6 @@ export class PostService {
     }
 
     async getPost(data: Prisma.PostWhereUniqueInput): Promise<PostDto | null> {
-        if (!data.id) throw new HttpError(400, 'id cannot be null');
         const post = await this.postRepository.getPost(data);
 
         if (!post) throw new HttpError(404, 'Post not found');
@@ -74,22 +76,72 @@ export class PostService {
         return this.postRepository.getReactions(postId);
     }
 
-    async createReport(
+    async reportPost(
         authorId: number,
         postId: number,
         data: Prisma.ReportCreateInput
     ): Promise<ReportDto> {
-        return await this.postRepository.createReport(authorId, postId, data);
+        const post = await this.postRepository.getPost({ id: postId });
+
+        if (!post) throw new HttpError(404, 'Post not found');
+
+        const reportCreated = await this.postRepository.createReport(
+            authorId,
+            postId,
+            data
+        );
+
+        if (!reportCreated) throw new HttpError(400, 'Something went wrong');
+
+        // await this.mailService.sendEmail({
+        //     htmlTemplate: postReportHtml,
+        //     subject: 'Post reported',
+        //     toAddresses: await this.accountService.getAccountEmail(),
+        //     textReplacer: (htmlData) =>
+        //         htmlData.replaceAll(
+        //             'POST',
+        //             `${process.env.HOST}/api/posts/${postId}`
+        //         ),
+        // });
+
+        return reportCreated;
     }
 
-    async deletePost(authorId: number, id: number): Promise<PostDto> {
-        const isAuthor = await this.postRepository.belongsTo(authorId, id);
+    async getReports(accountId: number, postId: number) {
+        const post = await this.postRepository.getPost({ id: postId });
 
-        if (!isAuthor)
-            throw new HttpError(403, 'Post does not belong to account');
+        if (!post) throw new HttpError(404, 'Post not found');
 
-        await this.commentRepository.deleteAllComments(id);
+        const account = await this.accountService.getAccount({
+            id: accountId,
+        });
+
+        if (account?.role !== 'MODERATOR')
+            throw new HttpError(403, 'Forbidden');
+
+        return this.postRepository.getReports(postId);
+    }
+
+    async deletePost(accountId: number, id: number): Promise<PostDto> {
+        let canDelete = true;
+        const isAuthor = await this.postRepository.belongsTo(accountId, id);
+
+        if (!isAuthor) {
+            const account = await this.accountService.getAccount({
+                id: accountId,
+            });
+
+            if (account?.role !== 'MODERATOR') canDelete = false;
+        }
+
+        if (!canDelete) throw new HttpError(403, 'Forbidden');
+
+        await this.commentService.deleteAllComments(id);
 
         return await this.postRepository.delete(id);
+    }
+
+    async deleteAllPost(authorId: number) {
+        return await this.postRepository.deleteAllPostAndComments(authorId);
     }
 }

@@ -6,8 +6,8 @@ import { ReportDto } from '../common/dtos/report.dto';
 export class PostRepository {
     private readonly prismaClient: PrismaClient;
 
-    constructor() {
-        this.prismaClient = new PrismaClient();
+    constructor(prismaClient: PrismaClient) {
+        this.prismaClient = prismaClient;
     }
 
     async create(data: Prisma.PostCreateInput): Promise<Post> {
@@ -83,7 +83,7 @@ export class PostRepository {
                 : null;
         }
 
-        return this.prismaClient.reactionsOnPosts.upsert({
+        return await this.prismaClient.reactionsOnPosts.upsert({
             where: {
                 postId_authorId: {
                     postId,
@@ -127,6 +127,14 @@ export class PostRepository {
                         id: postId,
                     },
                 },
+            },
+        });
+    }
+
+    async getReports(postId: number): Promise<ReportDto[]> {
+        return await this.prismaClient.report.findMany({
+            where: {
+                postId,
             },
         });
     }
