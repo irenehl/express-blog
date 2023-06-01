@@ -1,11 +1,12 @@
 import passportJwt from 'passport-jwt';
 import { AccountService } from '../account/acount.service';
+import prisma from './prisma.client';
 
 const JwtStrategy = passportJwt.Strategy;
 const ExtractJwt = passportJwt.ExtractJwt;
 
 export default function passportConfig() {
-    const accountService = new AccountService();
+    const accountService = new AccountService(prisma);
 
     return new JwtStrategy(
         {
@@ -13,7 +14,9 @@ export default function passportConfig() {
             secretOrKey: process.env.JWT_SECRET,
         },
         async function (jwtToken, done) {
-            const account = await accountService.getUser({ id: jwtToken.id });
+            const account = await accountService.getAccount({
+                id: jwtToken.id,
+            });
 
             if (!account) {
                 return done(new Error('Something went wrong'), false);
