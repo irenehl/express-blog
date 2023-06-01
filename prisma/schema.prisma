@@ -22,7 +22,8 @@ model Account {
     isPublicEmail  Boolean  @default(false) @map("is_public_email")
     isPublicName   Boolean  @default(false) @map("is_public_name")
 
-    recoveryToken  String?  @db.Uuid @map("recovery_token")
+    recoveryToken    String?  @db.Uuid @map("recovery_token")
+    verifyEmailToken String?  @db.Uuid @map("verify_email_token")
 
     comments            Comment[]
     posts               Post[]
