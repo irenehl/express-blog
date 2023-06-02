@@ -55,14 +55,6 @@ export class CommentRepository {
         commentId: number,
         data: Prisma.CommentUpdateInput
     ): Promise<CommentDto | null> {
-        const exists = await this.prismaClient.comment.findUnique({
-            where: {
-                id: 20000,
-            },
-        });
-
-        if (!exists) return null;
-
         return await this.prismaClient.comment.update({
             where: {
                 id: commentId,
@@ -149,10 +141,10 @@ export class CommentRepository {
         });
     }
 
-    async getReports(postId: number): Promise<ReportDto[]> {
+    async getReports(commentId: number): Promise<ReportDto[]> {
         return await this.prismaClient.report.findMany({
             where: {
-                postId,
+                commentId,
             },
         });
     }
@@ -165,13 +157,27 @@ export class CommentRepository {
         });
     }
 
-    async deleteAllComments(postId: number) {
+    async deleteAllComments(commentId: number) {
+        await this.prismaClient.reactionsOnComments.deleteMany({
+            where: {
+                commentId,
+            },
+        });
+
         return await this.prismaClient.comment.deleteMany({
             where: {
-                postId,
+                id: commentId,
             },
         });
     }
+
+    // async deleteAllReactions(commentId: number) {
+    //     return await this.prismaClient.reactionsOnComments.deleteMany({
+    //         where: {
+    //             commentId,
+    //         },
+    //     });
+    // }
 
     async belongsTo(authorId: number, commentId: number) {
         const comment = await this.prismaClient.comment.findFirst({

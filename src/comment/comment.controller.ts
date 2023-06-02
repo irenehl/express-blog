@@ -71,7 +71,7 @@ export class CommentController {
                 await this.commentService.reportComment(
                     Number(req.user?.id),
                     Number(req.params.id),
-                    req.body.description
+                    req.body
                 )
             );
     }

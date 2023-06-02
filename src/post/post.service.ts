@@ -93,8 +93,6 @@ export class PostService {
         postId: number,
         data: Prisma.ReportCreateInput
     ): Promise<ReportDto> {
-        validateSchema(data, reportPostSchema);
-
         const post = await this.postRepository.getPost({ id: postId });
 
         if (!post) throw new HttpError(404, 'Post not found');
@@ -137,6 +135,8 @@ export class PostService {
     }
 
     async deletePost(accountId: number, id: number): Promise<PostDto> {
+        await this.getPost({ id });
+
         let canDelete = true;
         const isAuthor = await this.postRepository.belongsTo(accountId, id);
 
@@ -150,6 +150,9 @@ export class PostService {
 
         if (!canDelete) throw new HttpError(403, 'Forbidden');
 
+        const post = await this.getPost({ id });
+
+        //await this.commentRepository.deleteAllReactions(id);
         await this.commentRepository.deleteAllComments(id);
 
         return await this.postRepository.delete(id);

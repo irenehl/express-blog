@@ -115,6 +115,7 @@ describe('PostService', () => {
         });
 
         it('Should delete a specific post when account is author', async () => {
+            prismaMock.post.findUnique.mockResolvedValue(postMock);
             prismaMock.post.findFirst.mockResolvedValue(postMock);
             prismaMock.comment.deleteMany.mockResolvedValue({
                 count: allCommentsMock.length,
@@ -132,6 +133,7 @@ describe('PostService', () => {
         it('Should delete a specific post when account is moderator', async () => {
             const account = modAccountFactoryMock();
 
+            prismaMock.post.findUnique.mockResolvedValue(postMock);
             prismaMock.account.findUnique.mockResolvedValue(account);
             prismaMock.post.delete.mockResolvedValue(postMock);
 
@@ -143,8 +145,8 @@ describe('PostService', () => {
             expect(result).toMatchObject(postMock);
         });
 
-        it('Should fail with 404 when account is not found', async () => {
-            prismaMock.post.findFirst.mockResolvedValue(null);
+        it('Should fail when delete a post with 404 when account is not found', async () => {
+            prismaMock.post.findUnique.mockResolvedValue(postMock);
             prismaMock.comment.deleteMany.mockResolvedValue({
                 count: allCommentsMock.length,
             });
@@ -155,7 +157,19 @@ describe('PostService', () => {
             ).rejects.toThrow('Account not found');
         });
 
+        it('Should fail when delete a post with 404 when post is not found', async () => {
+            prismaMock.post.findUnique.mockResolvedValue(null);
+            //prismaMock.post.findFirst.mockResolvedValue(null);
+
+            prismaMock.account.findUnique.mockResolvedValue(userAccountMock);
+
+            await expect(
+                postService.deletePost(userAccountMock.id, 1000)
+            ).rejects.toThrow('Post not found');
+        });
+
         it('Should fail when account is neither mod or author', async () => {
+            prismaMock.post.findUnique.mockResolvedValue(postMock);
             prismaMock.post.findFirst.mockResolvedValue(null);
 
             prismaMock.account.findUnique.mockResolvedValue(userAccountMock);

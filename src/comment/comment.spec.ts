@@ -143,18 +143,19 @@ describe('CommentService', () => {
             prismaMock.account.findFirstOrThrow.mockResolvedValue(
                 userAccountMock
             );
-            prismaMock.comment.findFirst.mockResolvedValue(commentMock);
+            prismaMock.comment.findFirst.mockResolvedValue(null);
             prismaMock.comment.findUnique.mockResolvedValue(null);
 
             await expect(
                 commentService.updateComment(userAccountMock.id, 10000, {
                     status: 'DRAFT',
                 })
-            ).rejects.toThrow('Something went wrong');
+            ).rejects.toThrow('Comment not found');
         });
 
         it('Should delete a specific comment when account is author', async () => {
             prismaMock.account.findFirst.mockResolvedValue(userAccountMock);
+            prismaMock.comment.findUnique.mockResolvedValue(commentMock);
             prismaMock.comment.findFirst.mockResolvedValue(commentMock);
 
             prismaMock.comment.delete.mockResolvedValue(commentMock);
@@ -167,11 +168,24 @@ describe('CommentService', () => {
             expect(result).toMatchObject(commentMock);
         });
 
+        it('Should fail when delete a comment that does not exists', async () => {
+            prismaMock.account.findFirstOrThrow.mockResolvedValue(
+                userAccountMock
+            );
+            prismaMock.comment.findFirst.mockResolvedValue(null);
+            prismaMock.comment.findUnique.mockResolvedValue(null);
+
+            await expect(
+                commentService.deleteComment(1000, userAccountMock.id)
+            ).rejects.toThrow('Comment not found');
+        });
+
         it('Should delete a specific comment when account is moderator', async () => {
             const account = modAccountFactoryMock();
 
             prismaMock.account.findFirst.mockResolvedValue(account);
             prismaMock.account.findUnique.mockResolvedValue(account);
+            prismaMock.comment.findUnique.mockResolvedValue(commentMock);
             prismaMock.comment.findFirst.mockResolvedValue(commentMock);
 
             prismaMock.comment.delete.mockResolvedValue(commentMock);
@@ -187,6 +201,7 @@ describe('CommentService', () => {
         it('Should fail when delete a specific comment when account is neither mod or author', async () => {
             prismaMock.account.findUnique.mockResolvedValue(userAccountMock);
             prismaMock.comment.findFirst.mockResolvedValue(null);
+            prismaMock.comment.findUnique.mockResolvedValue(commentMock);
 
             prismaMock.comment.delete.mockResolvedValue(commentMock);
 

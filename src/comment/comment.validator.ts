@@ -10,7 +10,7 @@ export const updateCommentSchema = joi.object({
     status: joi.string().optional(),
 });
 
-export const reportCommentSchema = joi.object({
-    description: joi.string().required(),
-    author: joi.optional(),
-});
+// export const reportCommentSchema = joi.object({
+//     description: joi.string().required(),
+//     author: joi.object().optional(),
+// });

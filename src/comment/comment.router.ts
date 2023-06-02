@@ -17,6 +17,7 @@ router.get(
 );
 router.get(
     '/:id/reports',
+    passport.authenticate('jwt', { session: false }),
     commentController.getReports.bind(commentController)
 );
 

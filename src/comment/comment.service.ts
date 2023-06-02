@@ -11,11 +11,7 @@ import { MailService } from '../mail/mail.service';
 import commentReportHtml from '../templates/comment-report.html';
 import { SESClient } from '@aws-sdk/client-ses';
 import validateSchema from '../common/validate';
-import {
-    createCommentSchema,
-    reportCommentSchema,
-    updateCommentSchema,
-} from './comment.validator';
+import { createCommentSchema, updateCommentSchema } from './comment.validator';
 
 export class CommentService {
     private readonly commentRepository: CommentRepository;
@@ -73,6 +69,10 @@ export class CommentService {
     ): Promise<CommentDto | null> {
         validateSchema(data, updateCommentSchema);
 
+        const comment = await this.commentRepository.getOne({ id: commentId });
+
+        if (!comment) throw new HttpError(404, 'Comment not found');
+
         const isAuthor = await this.commentRepository.belongsTo(
             authorId,
             commentId
@@ -85,8 +85,6 @@ export class CommentService {
             commentId,
             data
         );
-
-        if (!updatedComment) throw new HttpError(400, 'Something went wrong');
 
         return updatedComment;
     }
@@ -116,8 +114,6 @@ export class CommentService {
         commentId: number,
         data: Prisma.ReportCreateInput
     ): Promise<ReportDto> {
-        validateSchema(data, reportCommentSchema);
-
         const comment = await this.commentRepository.getOne({ id: commentId });
 
         if (!comment) throw new HttpError(404, 'Comment not found');
@@ -142,8 +138,8 @@ export class CommentService {
         return reportCreated;
     }
 
-    async getReports(accountId: number, commendId: number) {
-        const comment = await this.commentRepository.getOne({ id: commendId });
+    async getReports(accountId: number, commentId: number) {
+        const comment = await this.commentRepository.getOne({ id: commentId });
 
         if (!comment) throw new HttpError(404, 'Comment not found');
 
@@ -154,13 +150,17 @@ export class CommentService {
         if (account?.role !== 'MODERATOR')
             throw new HttpError(403, 'Forbidden');
 
-        return this.commentRepository.getReports(commendId);
+        return this.commentRepository.getReports(commentId);
     }
 
     async deleteComment(
         commentId: number,
         accountId: number
     ): Promise<CommentDto> {
+        const comment = await this.commentRepository.getOne({ id: commentId });
+
+        if (!comment) throw new HttpError(404, 'Comment not found');
+
         let canDelete = true;
 
         const isAuthor = await this.commentRepository.belongsTo(
