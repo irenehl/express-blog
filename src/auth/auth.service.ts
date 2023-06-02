@@ -10,16 +10,17 @@ import recoveryHtml from '../templates/recovery.html';
 import { loginSchema } from './auth.validator';
 import validateSchema from '../common/validate';
 import { PrismaClient } from '@prisma/client';
+import { SESClient } from '@aws-sdk/client-ses';
 
 export class AuthService {
     private readonly authRepository: AuthRepository;
     private readonly accountService: AccountService;
     private readonly mailService: MailService;
 
-    constructor(prismaClient: PrismaClient) {
+    constructor(aws: SESClient, prismaClient: PrismaClient) {
         this.authRepository = new AuthRepository(prismaClient);
-        this.accountService = new AccountService(prismaClient);
-        this.mailService = new MailService();
+        this.accountService = new AccountService(aws, prismaClient);
+        this.mailService = new MailService(aws);
     }
 
     async login(data: LoginDto): Promise<any> {
@@ -35,44 +36,45 @@ export class AuthService {
         return { token: jwt.sign(account, process.env.JWT_SECRET!) };
     }
 
-    // TODO
-    // async verifyEmail(email: string) {
-    //     const account = await this.accountService.getAccount({
-    //         email,
-    //     });
+    async verifyEmail(email: string, token: string) {
+        let account = await this.accountService.getAccount({
+            email,
+        });
 
-    //     if (!account)
-    //         throw new HttpError(404, 'Email not found in any account');
+        if (!account || account.verifyEmailToken !== token)
+            throw new HttpError(
+                401,
+                'Token is invalid, email cannot be verified'
+            );
 
-    //     const verifyToken = crypto.randomUUID();
+        account = await this.accountService.update(account.id, {
+            verifyEmailToken: null,
+        });
 
-    //     ``;
-    // }
+        return account;
+    }
 
     async recoveryRequest(email: string) {
         const account = await this.accountService.getAccount({
             email,
         });
 
-        if (!account)
-            throw new HttpError(404, 'Email not found in any account');
-
         const recoveryToken = crypto.randomUUID();
 
-        await this.accountService.update(account.id, {
+        await this.accountService.update(account!.id, {
             recoveryToken,
         });
 
-        // await this.mailService.sendEmail({
-        //     htmlTemplate: recoveryHtml,
-        //     subject: 'Reset your password',
-        //     toAddresses: [account.email],
-        //     textReplacer: (html) =>
-        //         html.replaceAll(
-        //             'RECOVERY',
-        //             `${process.env.HOST}/api/auth/recover/reset/${recoveryToken}`
-        //         ),
-        // });
+        await this.mailService.sendEmail({
+            htmlTemplate: recoveryHtml,
+            subject: 'Reset your password',
+            toAddresses: [account!.email],
+            textReplacer: (html) =>
+                html.replaceAll(
+                    'RECOVERY',
+                    `${process.env.HOST}/api/auth/recover/reset/${recoveryToken}`
+                ),
+        });
     }
 
     async resetPassword(password: string, recoveryToken: string) {

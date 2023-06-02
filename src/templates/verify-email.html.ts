@@ -5,10 +5,10 @@ export default `
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Welcome USERNAME</title>
+        <title>Verify email</title>
     </head>
     <body>
-        Welcome USERNAME, to verify your email enter <a href="EMAIL_VERIFICATION">HERE</a>
+        Click <a href="VERIFY">here</a> to verify your account
     </body>
     </html>
 `;

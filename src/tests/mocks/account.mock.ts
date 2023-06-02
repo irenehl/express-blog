@@ -23,6 +23,8 @@ export const userAccountMock = {
     role: 'USER' as Role,
     username: 'daniela2',
     email: 'danielalopez+user@ravn.co',
+    recoveryToken: '123',
+    verifyEmailToken: '456',
 };
 
 export const updatedAccountMock = {
