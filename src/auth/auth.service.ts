@@ -7,11 +7,7 @@ import { AccountService } from '../account/acount.service';
 import { MailService } from '../mail/mail.service';
 
 import recoveryHtml from '../templates/recovery.html';
-import {
-    emailSchema,
-    loginSchema,
-    resetPasswordSchema,
-} from './auth.validator';
+import { loginSchema } from './auth.validator';
 import validateSchema from '../common/validate';
 import { PrismaClient } from '@prisma/client';
 import { SESClient } from '@aws-sdk/client-ses';
@@ -41,8 +37,6 @@ export class AuthService {
     }
 
     async verifyEmail(email: string, token: string) {
-        validateSchema(email, emailSchema);
-
         let account = await this.accountService.getAccount({
             email,
         });
@@ -61,8 +55,6 @@ export class AuthService {
     }
 
     async recoveryRequest(email: string) {
-        validateSchema(email, emailSchema);
-
         const account = await this.accountService.getAccount({
             email,
         });
@@ -86,8 +78,6 @@ export class AuthService {
     }
 
     async resetPassword(password: string, recoveryToken: string) {
-        validateSchema(password, resetPasswordSchema);
-
         if (password === '' || !password)
             throw new HttpError(400, 'Password is invalid');
 

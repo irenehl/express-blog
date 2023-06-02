@@ -11,7 +11,11 @@ import { CommentRepository } from '../comment/comment.repository';
 import { SESClient } from '@aws-sdk/client-ses';
 import postReportHtml from '../templates/post-report.html';
 import validateSchema from '../common/validate';
-import { postSchema, reportPostSchema } from './post.validate';
+import {
+    createPostSchema,
+    reportPostSchema,
+    updatePostSchema,
+} from './post.validator';
 
 export class PostService {
     private readonly postRepository: PostRepository;
@@ -27,7 +31,7 @@ export class PostService {
     }
 
     async createPost(accountId: number, data: CreatePostDto): Promise<PostDto> {
-        validateSchema(data, postSchema);
+        validateSchema(data, createPostSchema);
 
         const account = await this.accountService.getAccount({ id: accountId });
 
@@ -58,7 +62,7 @@ export class PostService {
         id: number,
         data: Prisma.PostUpdateInput
     ): Promise<PostDto> {
-        validateSchema(data, postSchema);
+        validateSchema(data, updatePostSchema);
 
         const isAuthor = await this.postRepository.belongsTo(authorId, id);
 

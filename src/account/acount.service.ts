@@ -11,7 +11,7 @@ import { MailService } from '../mail/mail.service';
 import welcomeHtml from '../templates/welcome.html';
 import { SESClient } from '@aws-sdk/client-ses';
 import validateSchema from '../common/validate';
-import { createAccountSchema, updateAccountSchema } from './account.validate';
+import { createAccountSchema, updateAccountSchema } from './account.validator';
 
 export class AccountService {
     private readonly accountRepository: AccountRepository;

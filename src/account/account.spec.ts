@@ -25,7 +25,7 @@ describe('AccountService', () => {
             const result = await accountService.createAccount({
                 name: 'Daniela',
                 lastname: 'Huezo',
-                email: 'danielalopez+user@ravn.c',
+                email: 'danielalopez+user@ravn.co',
                 username: 'daniela2',
                 password: 'password123',
             });
@@ -41,7 +41,7 @@ describe('AccountService', () => {
                 accountService.createAccount({
                     name: 'Daniela',
                     lastname: 'Huezo',
-                    email: 'danielalopez+user@ravn.c',
+                    email: 'danielalopez+user@ravn.co',
                     username: 'daniela2',
                     password: 'password123',
                 })

@@ -44,7 +44,7 @@ describe('AuthService', () => {
             await expect(
                 authService.login({
                     email: 'danielalopez@ravn.co',
-                    password: 'a',
+                    password: 'loremipsum',
                 })
             ).rejects.toThrowError('Unauthorized');
         });
@@ -111,10 +111,10 @@ describe('AuthService', () => {
             prismaMock.account.findUnique.mockResolvedValue(userAccountMock);
             prismaMock.account.update.mockResolvedValue({
                 ...userAccountMock,
-                password: await bcrypt.hash('new-pass', 10),
+                password: await bcrypt.hash('newpass12', 10),
             });
 
-            await authService.resetPassword('new-pass', '123');
+            await authService.resetPassword('newpass12', '123');
 
             expect(prismaMock.account.findFirst).toHaveBeenCalled();
             expect(prismaMock.account.update).toHaveBeenCalled();

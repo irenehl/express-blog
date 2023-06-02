@@ -11,7 +11,11 @@ import { MailService } from '../mail/mail.service';
 import commentReportHtml from '../templates/comment-report.html';
 import { SESClient } from '@aws-sdk/client-ses';
 import validateSchema from '../common/validate';
-import { commentSchema, reportCommentSchema } from './comment.validate';
+import {
+    createCommentSchema,
+    reportCommentSchema,
+    updateCommentSchema,
+} from './comment.validator';
 
 export class CommentService {
     private readonly commentRepository: CommentRepository;
@@ -31,7 +35,7 @@ export class CommentService {
         postId: number,
         data: CreateCommentDto
     ): Promise<CommentDto> {
-        validateSchema(data, commentSchema);
+        validateSchema(data, createCommentSchema);
 
         const account = await this.accountService.getAccount({ id: accountId });
         const post = await this.postService.getPost({ id: postId });
@@ -67,7 +71,7 @@ export class CommentService {
         commentId: number,
         data: Prisma.CommentUpdateInput
     ): Promise<CommentDto | null> {
-        validateSchema(data, commentSchema);
+        validateSchema(data, updateCommentSchema);
 
         const isAuthor = await this.commentRepository.belongsTo(
             authorId,
