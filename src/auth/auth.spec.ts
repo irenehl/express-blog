@@ -24,6 +24,7 @@ describe('AuthService', () => {
 
     describe('/auth/login', () => {
         it('Should return a token when account is valid', async () => {
+            process.env.JWT_SECRET = 'ANYTHING';
             prismaMock.account.findUnique.mockResolvedValue(
                 modAccountFactoryMock()
             );
