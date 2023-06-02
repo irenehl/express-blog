@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "undefined/subscriptions/8b627bb5-2a5b-4dac-9ea4-6444852ade98/resourceGroups/rg-ravn/providers/Microsoft.Web/sites/rest-module-daniela",
+    "appService.deploySubpath": "."
+}

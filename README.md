@@ -80,9 +80,9 @@ model Comment {
     createdAt           DateTime              @default(now()) @map("created_at")
     updatedAt           DateTime              @default(now()) @map("updated_at")
     reports             Report[]
-    author              Account               @relation(fields: [authorId], references: [id])
+    author              Account               @relation(fields: [authorId], references: [id], onDelete: Cascade)
     authorId            Int                   @map("author_id")
-    post                Post                  @relation(fields: [postId], references: [id])
+    post                Post                  @relation(fields: [postId], references: [id], onDelete: Cascade)
     postId              Int                   @map("post_id")
     ReactionsOnComments ReactionsOnComments[]
 }
@@ -96,7 +96,7 @@ model Post {
     createdAt        DateTime           @default(now()) @map("created_at")
     updatedAt        DateTime           @default(now()) @map("updated_at")
     reports          Report[]
-    author           Account            @relation(fields: [authorId], references: [id])
+    author           Account            @relation(fields: [authorId], references: [id], onDelete: Cascade)
     authorId         Int                @map("author_id")
     comments         Comment[]
     ReactionsOnPosts ReactionsOnPosts[]
@@ -106,7 +106,7 @@ You can find all the prisma schemas [here](prisma/schema.prisma)
 
 ## Endpoints 
 
-Endpoints are documented in [Insonmia client](https://insomnia.rest/download), you can file the JSON file [here](src/docs/endpoints.json) 
+Endpoints are documented in [Insonmia client](https://insomnia.rest/download), you can file the JSON file [here](src/docs/blog-api.json) 
 
 ## Deploy
 
