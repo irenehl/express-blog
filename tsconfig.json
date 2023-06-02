@@ -8,6 +8,7 @@
         "outDir": "dist",
         "forceConsistentCasingInFileNames": true,
         "typeRoots": ["./node_modules/@types", "./src/types"],
-        "types": ["express"]
+        "types": ["express"],
+        "skipLibCheck": true
     }
 }

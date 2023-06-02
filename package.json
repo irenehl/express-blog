@@ -6,7 +6,7 @@
     "author": "irenehl <26irenelopez@gmail.com>",
     "license": "MIT",
     "scripts": {
-        "build": "npx tsc",
+        "build": "tsc",
         "start": "node dist/src/main.js",
         "dev": "nodemon ./src/main.ts",
         "lint": "eslint --fix --ext .js,.ts .",
