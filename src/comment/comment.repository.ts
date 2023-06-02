@@ -39,8 +39,8 @@ export class CommentRepository {
         const { page, limit, cursor, where, orderBy } = params;
 
         return await this.prismaClient.comment.findMany({
-            skip: Number(page - 1),
-            take: Number(limit),
+            skip: page - 1,
+            take: limit,
             cursor,
             orderBy,
             where: {

@@ -17,9 +17,11 @@ export class AccountController {
     }
 
     async getAccount(req: Request, res: Response) {
-        return res
-            .status(200)
-            .json(await this.accountService.getAccount({ id: +req.params.id }));
+        return res.status(200).json(
+            await this.accountService.getAccount({
+                id: Number(req.params.id),
+            })
+        );
     }
 
     async getAll(req: Request, res: Response) {
@@ -34,12 +36,17 @@ export class AccountController {
     async update(req: Request, res: Response) {
         return res
             .status(200)
-            .json(await this.accountService.update(+req.params.id, req.body));
+            .json(
+                await this.accountService.update(
+                    Number(req.params.id),
+                    req.body
+                )
+            );
     }
 
     async delete(req: Request, res: Response) {
         return res
             .status(200)
-            .json(await this.accountService.delete(+req.params.id));
+            .json(await this.accountService.delete(Number(req.params.id)));
     }
 }

@@ -15,8 +15,8 @@ export class CommentController {
             .status(200)
             .json(
                 await this.commentService.createComment(
-                    +req.user.id,
-                    +req.params.id,
+                    Number(req.user?.id),
+                    Number(req.params.id),
                     req.body
                 )
             );
@@ -37,8 +37,8 @@ export class CommentController {
             .status(200)
             .json(
                 await this.commentService.updateComment(
-                    +req.user!.id,
-                    +req.params.id,
+                    Number(req.user?.id),
+                    Number(req.params.id),
                     req.body
                 )
             );
@@ -71,7 +71,7 @@ export class CommentController {
                 await this.commentService.reportComment(
                     Number(req.user?.id),
                     Number(req.params.id),
-                    req.body
+                    req.body.description
                 )
             );
     }
@@ -92,8 +92,8 @@ export class CommentController {
             .status(200)
             .json(
                 await this.commentService.deleteComment(
-                    +req.params.id,
-                    +req.user!.id
+                    Number(req.params.id),
+                    Number(req.user?.id)
                 )
             );
     }

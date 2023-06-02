@@ -36,8 +36,8 @@ export class PostRepository {
         const { page, limit, cursor, where, orderBy } = params;
 
         return await this.prismaClient.post.findMany({
-            skip: +page!,
-            take: +limit!,
+            skip: page - 1,
+            take: limit,
             cursor,
             where,
             orderBy,

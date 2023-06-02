@@ -13,13 +13,20 @@ export class PostController {
     async create(req: any, res: Response) {
         return res
             .status(200)
-            .json(await this.postService.createPost(+req.user.id!, req.body));
+            .json(
+                await this.postService.createPost(
+                    Number(req.user?.id),
+                    req.body
+                )
+            );
     }
 
     async getPost(req: Request, res: Response) {
         return res
             .status(200)
-            .json(await this.postService.getPost({ id: +req.params.id }));
+            .json(
+                await this.postService.getPost({ id: Number(req.params.id) })
+            );
     }
 
     async getAll(req: Request, res: Response) {
@@ -36,8 +43,8 @@ export class PostController {
             .status(200)
             .json(
                 await this.postService.updatePost(
-                    +req.user!.id,
-                    +req.params.id,
+                    Number(req.user?.id),
+                    Number(req.params.id),
                     req.body
                 )
             );
@@ -88,7 +95,10 @@ export class PostController {
         return res
             .status(200)
             .json(
-                await this.postService.deletePost(+req.user!.id, +req.params.id)
+                await this.postService.deletePost(
+                    Number(req.user?.id),
+                    Number(req.params.id)
+                )
             );
     }
 }
