@@ -15,14 +15,14 @@ export default function passportConfig() {
             secretOrKey: process.env.JWT_SECRET,
         },
         async function (jwtToken, done) {
-            const account = await accountService.getAccount({
-                id: jwtToken.id,
-            });
+            try {
+                const account = await accountService.getAccount({
+                    id: jwtToken.id,
+                });
 
-            if (!account) {
+                return done(null, account!);
+            } catch (error) {
                 return done(new Error('Something went wrong'), false);
-            } else {
-                return done(null, account);
             }
         }
     );

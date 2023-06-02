@@ -10,16 +10,10 @@ router.post('/', accountController.createAccount.bind(accountController));
 router.get('/:id', accountController.getAccount.bind(accountController));
 router.get('/', accountController.getAll.bind(accountController));
 
-router.patch(
-    '/:id',
-    passport.authenticate('jwt', { session: false }),
-    accountController.update.bind(accountController)
-);
+router.use(passport.authenticate('jwt', { session: false }));
 
-router.delete(
-    '/:id',
-    passport.authenticate('jwt', { session: false }),
-    accountController.delete.bind(accountController)
-);
+router.patch('/:id', accountController.update.bind(accountController));
+
+router.delete('/:id', accountController.delete.bind(accountController));
 
 export default router;

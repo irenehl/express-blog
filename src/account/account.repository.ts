@@ -26,7 +26,7 @@ export class AccountRepository extends BaseRepository<Account> {
 
         const hashedPassword = await bcrypt.hash(
             dto.password,
-            +process.env.SALT!
+            Number(process.env.SALT!)
         );
 
         return this.exclude(

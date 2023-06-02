@@ -5,7 +5,6 @@ import { AccountDto } from './dtos/account.dto';
 import { GetAccountDto } from './dtos/get-account.dto';
 import { UpdateAccountDto } from './dtos/update-account.dto';
 import { Pagination } from '../common/interfaces/pagination';
-import { PostRepository } from '../post/post.repository';
 import { MailService } from '../mail/mail.service';
 
 import welcomeHtml from '../templates/welcome.html';
@@ -15,12 +14,10 @@ import { createAccountSchema, updateAccountSchema } from './account.validator';
 
 export class AccountService {
     private readonly accountRepository: AccountRepository;
-    private readonly postRepository: PostRepository; // To avoid redundancy
     private readonly mailService: MailService;
 
     constructor(aws: SESClient, prismaClient: PrismaClient) {
         this.accountRepository = new AccountRepository(prismaClient);
-        this.postRepository = new PostRepository(prismaClient);
         this.mailService = new MailService(aws);
     }
 
