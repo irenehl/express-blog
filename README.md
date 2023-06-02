@@ -113,3 +113,5 @@ Endpoints are documented in [Insonmia client](https://insomnia.rest/download), y
 ## Test coverage
 
 This project has 100% of coverage
+
+![image](https://github.com/irenehl/nerdery-rest-module/assets/54600515/1b1c3915-56eb-403a-aa9e-a7c8413e696d)
