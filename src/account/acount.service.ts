@@ -82,6 +82,8 @@ export class AccountService {
     }
 
     async delete(id: number): Promise<AccountDto | null> {
+        await this.getAccount({ id });
+
         return await this.accountRepository.delete(id);
     }
 }
