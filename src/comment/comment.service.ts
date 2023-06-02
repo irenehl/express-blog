@@ -10,6 +10,8 @@ import { ReportDto } from '../common/dtos/report.dto';
 import { MailService } from '../mail/mail.service';
 import commentReportHtml from '../templates/comment-report.html';
 import { SESClient } from '@aws-sdk/client-ses';
+import validateSchema from '../common/validate';
+import { commentSchema, reportCommentSchema } from './comment.validate';
 
 export class CommentService {
     private readonly commentRepository: CommentRepository;
@@ -29,6 +31,8 @@ export class CommentService {
         postId: number,
         data: CreateCommentDto
     ): Promise<CommentDto> {
+        validateSchema(data, commentSchema);
+
         const account = await this.accountService.getAccount({ id: accountId });
         const post = await this.postService.getPost({ id: postId });
 
@@ -63,6 +67,8 @@ export class CommentService {
         commentId: number,
         data: Prisma.CommentUpdateInput
     ): Promise<CommentDto | null> {
+        validateSchema(data, commentSchema);
+
         const isAuthor = await this.commentRepository.belongsTo(
             authorId,
             commentId
@@ -106,6 +112,8 @@ export class CommentService {
         commentId: number,
         data: Prisma.ReportCreateInput
     ): Promise<ReportDto> {
+        validateSchema(data, reportCommentSchema);
+
         const comment = await this.commentRepository.getOne({ id: commentId });
 
         if (!comment) throw new HttpError(404, 'Comment not found');

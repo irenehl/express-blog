@@ -10,6 +10,8 @@ import { MailService } from '../mail/mail.service';
 import { CommentRepository } from '../comment/comment.repository';
 import { SESClient } from '@aws-sdk/client-ses';
 import postReportHtml from '../templates/post-report.html';
+import validateSchema from '../common/validate';
+import { postSchema, reportPostSchema } from './post.validate';
 
 export class PostService {
     private readonly postRepository: PostRepository;
@@ -25,6 +27,8 @@ export class PostService {
     }
 
     async createPost(accountId: number, data: CreatePostDto): Promise<PostDto> {
+        validateSchema(data, postSchema);
+
         const account = await this.accountService.getAccount({ id: accountId });
 
         return this.postRepository.create({
@@ -54,6 +58,8 @@ export class PostService {
         id: number,
         data: Prisma.PostUpdateInput
     ): Promise<PostDto> {
+        validateSchema(data, postSchema);
+
         const isAuthor = await this.postRepository.belongsTo(authorId, id);
 
         if (!isAuthor)
@@ -83,6 +89,8 @@ export class PostService {
         postId: number,
         data: Prisma.ReportCreateInput
     ): Promise<ReportDto> {
+        validateSchema(data, reportPostSchema);
+
         const post = await this.postRepository.getPost({ id: postId });
 
         if (!post) throw new HttpError(404, 'Post not found');

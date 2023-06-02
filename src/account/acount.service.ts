@@ -10,6 +10,8 @@ import { MailService } from '../mail/mail.service';
 
 import welcomeHtml from '../templates/welcome.html';
 import { SESClient } from '@aws-sdk/client-ses';
+import validateSchema from '../common/validate';
+import { createAccountSchema, updateAccountSchema } from './account.validate';
 
 export class AccountService {
     private readonly accountRepository: AccountRepository;
@@ -25,6 +27,8 @@ export class AccountService {
     async createAccount(
         data: Prisma.AccountCreateInput
     ): Promise<AccountDto | null> {
+        validateSchema(data, createAccountSchema);
+
         const account = await this.accountRepository.createAccount(data);
 
         if (!account) throw new HttpError(409, 'Account already exists');
@@ -68,6 +72,8 @@ export class AccountService {
     }
 
     async update(id: number, data: UpdateAccountDto): Promise<AccountDto> {
+        validateSchema(data, updateAccountSchema);
+
         const account = await this.accountRepository.update(id, data);
 
         if (!account) throw new HttpError(400, 'Something went wrong');
