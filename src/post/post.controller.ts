@@ -1,3 +1,4 @@
+import aws from '../config/aws';
 import prisma from '../config/prisma.client';
 import { PostService } from './post.service';
 import { Request, Response } from 'express';
@@ -6,7 +7,7 @@ export class PostController {
     private readonly postService: PostService;
 
     constructor() {
-        this.postService = new PostService(prisma);
+        this.postService = new PostService(aws, prisma);
     }
 
     async create(req: any, res: Response) {

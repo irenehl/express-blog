@@ -17,8 +17,8 @@ interface MailInfo {
 export class MailService {
     private readonly sesClient: SESClient;
 
-    constructor() {
-        this.sesClient = new SESClient({ region: 'us-east-1' });
+    constructor(sesClient: SESClient) {
+        this.sesClient = sesClient;
     }
 
     private createParams(mailParams: MailParams) {

@@ -1,3 +1,4 @@
+import aws from '../config/aws';
 import prisma from '../config/prisma.client';
 import { CommentService } from './comment.service';
 import { Request, Response } from 'express';
@@ -6,7 +7,7 @@ export class CommentController {
     private readonly commentService: CommentService;
 
     constructor() {
-        this.commentService = new CommentService(prisma);
+        this.commentService = new CommentService(aws, prisma);
     }
 
     async create(req: any, res: Response) {

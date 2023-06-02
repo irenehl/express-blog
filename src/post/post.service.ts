@@ -8,18 +8,22 @@ import { Pagination } from '../common/interfaces/pagination';
 import { ReportDto } from '../common/dtos/report.dto';
 import { MailService } from '../mail/mail.service';
 import { CommentService } from '../comment/comment.service';
+import { CommentRepository } from '../comment/comment.repository';
+import aws from '../config/aws';
+import { SESClient } from '@aws-sdk/client-ses';
+import postReportHtml from '../templates/post-report.html';
 
 export class PostService {
     private readonly postRepository: PostRepository;
     private readonly accountService: AccountService;
-    private readonly commentService: CommentService;
+    private readonly commentRepository: CommentRepository; // To avoid redundancy
     private readonly mailService: MailService;
 
-    constructor(prismaClient: PrismaClient) {
+    constructor(aws: SESClient, prismaClient: PrismaClient) {
         this.postRepository = new PostRepository(prismaClient);
-        this.accountService = new AccountService(prismaClient);
-        this.commentService = new CommentService(prismaClient);
-        this.mailService = new MailService();
+        this.accountService = new AccountService(aws, prismaClient);
+        this.commentRepository = new CommentRepository(prismaClient);
+        this.mailService = new MailService(aws);
     }
 
     async createPost(accountId: number, data: CreatePostDto): Promise<PostDto> {
@@ -93,16 +97,16 @@ export class PostService {
 
         if (!reportCreated) throw new HttpError(400, 'Something went wrong');
 
-        // await this.mailService.sendEmail({
-        //     htmlTemplate: postReportHtml,
-        //     subject: 'Post reported',
-        //     toAddresses: await this.accountService.getAccountEmail(),
-        //     textReplacer: (htmlData) =>
-        //         htmlData.replaceAll(
-        //             'POST',
-        //             `${process.env.HOST}/api/posts/${postId}`
-        //         ),
-        // });
+        await this.mailService.sendEmail({
+            htmlTemplate: postReportHtml,
+            subject: 'Post reported',
+            toAddresses: await this.accountService.getAccountEmail(),
+            textReplacer: (htmlData) =>
+                htmlData.replaceAll(
+                    'POST',
+                    `${process.env.HOST}/api/posts/${postId}`
+                ),
+        });
 
         return reportCreated;
     }
@@ -136,12 +140,8 @@ export class PostService {
 
         if (!canDelete) throw new HttpError(403, 'Forbidden');
 
-        await this.commentService.deleteAllComments(id);
+        await this.commentRepository.deleteAllComments(id);
 
         return await this.postRepository.delete(id);
-    }
-
-    async deleteAllPost(authorId: number) {
-        return await this.postRepository.deleteAllPostAndComments(authorId);
     }
 }

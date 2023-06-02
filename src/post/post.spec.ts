@@ -1,3 +1,4 @@
+import aws from '../config/aws';
 import {
     allAccountsMock,
     modAccountFactoryMock,
@@ -16,11 +17,19 @@ import { prismaMock } from '../tests/mocks/prisma.mock';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PostService } from './post.service';
 
-describe('PostService', () => {
-    let postService: PostService;
+let postService: PostService;
 
+jest.mock('../config/aws', () => {
+    const ses = {
+        send: jest.fn(),
+    };
+
+    return ses;
+});
+
+describe('PostService', () => {
     beforeEach(() => {
-        postService = new PostService(prismaMock);
+        postService = new PostService(aws, prismaMock);
     });
 
     describe('/posts', () => {
@@ -224,6 +233,7 @@ describe('PostService', () => {
                 }
             );
 
+            expect(aws.send).toHaveBeenCalled();
             expect(result).toMatchObject(reportMock);
             expect(result.postId).toEqual(3);
         });

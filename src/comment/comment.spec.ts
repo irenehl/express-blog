@@ -1,4 +1,5 @@
 import { HttpError } from '../common/http-error';
+import aws from '../config/aws';
 import {
     allAccountsMock,
     modAccountFactoryMock,
@@ -17,11 +18,19 @@ import { postMock } from '../tests/mocks/post.mock';
 import { prismaMock } from '../tests/mocks/prisma.mock';
 import { CommentService } from './comment.service';
 
-describe('CommentService', () => {
-    let commentService: CommentService;
+let commentService: CommentService;
 
+jest.mock('../config/aws', () => {
+    const ses = {
+        send: jest.fn(),
+    };
+
+    return ses;
+});
+
+describe('CommentService', () => {
     beforeEach(() => {
-        commentService = new CommentService(prismaMock);
+        commentService = new CommentService(aws, prismaMock);
     });
 
     describe('/posts/:id/comments', () => {
@@ -285,6 +294,7 @@ describe('CommentService', () => {
                 }
             );
 
+            expect(aws.send).toHaveBeenCalled();
             expect(result).toMatchObject(commentReportMock);
             expect(result.commentId).toEqual(1);
         });

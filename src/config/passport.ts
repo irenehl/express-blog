@@ -1,12 +1,13 @@
 import passportJwt from 'passport-jwt';
 import { AccountService } from '../account/acount.service';
 import prisma from './prisma.client';
+import aws from './aws';
 
 const JwtStrategy = passportJwt.Strategy;
 const ExtractJwt = passportJwt.ExtractJwt;
 
 export default function passportConfig() {
-    const accountService = new AccountService(prisma);
+    const accountService = new AccountService(aws, prisma);
 
     return new JwtStrategy(
         {

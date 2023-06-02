@@ -9,6 +9,8 @@ import { HttpError } from '../common/http-error';
 import { ReportDto } from '../common/dtos/report.dto';
 import { MailService } from '../mail/mail.service';
 import commentReportHtml from '../templates/comment-report.html';
+import aws from '../config/aws';
+import { SESClient } from '@aws-sdk/client-ses';
 
 export class CommentService {
     private readonly commentRepository: CommentRepository;
@@ -16,11 +18,11 @@ export class CommentService {
     private readonly postService: PostService;
     private readonly mailService: MailService;
 
-    constructor(prismaClient: PrismaClient) {
+    constructor(aws: SESClient, prismaClient: PrismaClient) {
         this.commentRepository = new CommentRepository(prismaClient);
-        this.accountService = new AccountService(prismaClient);
-        this.postService = new PostService(prismaClient);
-        this.mailService = new MailService();
+        this.accountService = new AccountService(aws, prismaClient);
+        this.postService = new PostService(aws, prismaClient);
+        this.mailService = new MailService(aws);
     }
 
     async createComment(
@@ -50,9 +52,7 @@ export class CommentService {
         postId: number,
         data: Pagination
     ): Promise<CommentDto[] | null> {
-        const post = await this.postService.getPost({ id: postId });
-
-        if (!post) throw new HttpError(404, 'Post not found');
+        await this.postService.getPost({ id: postId });
 
         return await this.commentRepository.getAll({
             ...data,
@@ -117,16 +117,16 @@ export class CommentService {
             data
         );
 
-        // await this.mailService.sendEmail({
-        //     htmlTemplate: commentReportHtml,
-        //     subject: 'Comment reported',
-        //     toAddresses: await this.accountService.getAccountEmail(),
-        //     textReplacer: (htmlData) =>
-        //         htmlData.replaceAll(
-        //             'COMMENT',
-        //             `${process.env.HOST}/api/posts/${comment.postId}/comments/${commentId}`
-        //         ),
-        // });
+        await this.mailService.sendEmail({
+            htmlTemplate: commentReportHtml,
+            subject: 'Comment reported',
+            toAddresses: await this.accountService.getAccountEmail(),
+            textReplacer: (htmlData) =>
+                htmlData.replaceAll(
+                    'COMMENT',
+                    `${process.env.HOST}/api/posts/${comment.postId}/comments/${commentId}`
+                ),
+        });
 
         return reportCreated;
     }
@@ -168,9 +168,5 @@ export class CommentService {
         if (!canDelete) throw new HttpError(403, 'Forbidden');
 
         return await this.commentRepository.delete(commentId);
-    }
-
-    async deleteAllComments(postId: number) {
-        return await this.commentRepository.deleteAllComments(postId);
     }
 }
