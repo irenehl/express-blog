@@ -9,7 +9,6 @@ import { HttpError } from '../common/http-error';
 import { ReportDto } from '../common/dtos/report.dto';
 import { MailService } from '../mail/mail.service';
 import commentReportHtml from '../templates/comment-report.html';
-import aws from '../config/aws';
 import { SESClient } from '@aws-sdk/client-ses';
 
 export class CommentService {

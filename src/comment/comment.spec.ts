@@ -1,4 +1,3 @@
-import { HttpError } from '../common/http-error';
 import aws from '../config/aws';
 import {
     allAccountsMock,

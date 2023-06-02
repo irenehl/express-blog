@@ -7,9 +7,7 @@ import { PostDto } from './dto/post.dto';
 import { Pagination } from '../common/interfaces/pagination';
 import { ReportDto } from '../common/dtos/report.dto';
 import { MailService } from '../mail/mail.service';
-import { CommentService } from '../comment/comment.service';
 import { CommentRepository } from '../comment/comment.repository';
-import aws from '../config/aws';
 import { SESClient } from '@aws-sdk/client-ses';
 import postReportHtml from '../templates/post-report.html';
 
