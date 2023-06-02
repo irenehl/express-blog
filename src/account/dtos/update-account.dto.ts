@@ -5,4 +5,5 @@ export interface UpdateAccountDto extends Prisma.AccountUpdateInput {
     lastname?: string;
     password?: string;
     email?: string;
+    verifyToken?: string;
 }

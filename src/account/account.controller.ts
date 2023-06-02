@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
 import { AccountService } from './acount.service';
 import prisma from '../config/prisma.client';
+import aws from '../config/aws';
 
 export class AccountController {
     private readonly accountService: AccountService;
 
     constructor() {
-        this.accountService = new AccountService(prisma);
+        this.accountService = new AccountService(aws, prisma);
     }
 
     async createAccount(req: Request, res: Response) {

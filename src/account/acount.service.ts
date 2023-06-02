@@ -9,17 +9,17 @@ import { PostRepository } from '../post/post.repository';
 import { MailService } from '../mail/mail.service';
 
 import welcomeHtml from '../templates/welcome.html';
-import { PostService } from '../post/post.service';
+import { SESClient } from '@aws-sdk/client-ses';
 
 export class AccountService {
     private readonly accountRepository: AccountRepository;
-    private readonly postService: PostService;
+    private readonly postRepository: PostRepository; // To avoid redundancy
     private readonly mailService: MailService;
 
-    constructor(prismaClient: PrismaClient) {
+    constructor(aws: SESClient, prismaClient: PrismaClient) {
         this.accountRepository = new AccountRepository(prismaClient);
-        this.postService = new PostService(prismaClient);
-        this.mailService = new MailService();
+        this.postRepository = new PostRepository(prismaClient);
+        this.mailService = new MailService(aws);
     }
 
     async createAccount(
@@ -29,13 +29,20 @@ export class AccountService {
 
         if (!account) throw new HttpError(409, 'Account already exists');
 
-        // await this.mailService.sendEmail({
-        //     htmlTemplate: welcomeHtml,
-        //     toAddresses: [account.email],
-        //     subject: 'Thanks for registering',
-        //     textReplacer: (htmlData) =>
-        //         htmlData.replaceAll('USERNAME', account.username),
-        // });
+        await this.mailService.sendEmail({
+            htmlTemplate: welcomeHtml,
+            toAddresses: [account.email],
+            subject: 'Thanks for registering',
+            textReplacer: (htmlData) =>
+                htmlData
+                    .replaceAll('USERNAME', account.username)
+                    .replaceAll(
+                        'EMAIL_VERIFICATION',
+                        `${process.env.HOST!}/auth/verify/${
+                            account.verifyEmailToken
+                        }`
+                    ),
+        });
 
         return account;
     }
@@ -69,7 +76,7 @@ export class AccountService {
     }
 
     async delete(id: number): Promise<AccountDto> {
-        await this.postService.deleteAllPost(id);
+        await this.postRepository.deleteAllPostAndComments(id);
 
         return await this.accountRepository.delete(id);
     }

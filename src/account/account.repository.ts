@@ -34,6 +34,7 @@ export class AccountRepository extends BaseRepository<Account> {
                 data: {
                     ...dto,
                     password: hashedPassword,
+                    verifyEmailToken: crypto.randomUUID(),
                 },
             }),
             ['password']
@@ -128,12 +129,7 @@ export class AccountRepository extends BaseRepository<Account> {
             },
         });
 
-        return this.exclude(account, [
-            'password',
-            'updatedAt',
-            'createdAt',
-            'verifyEmailToken',
-        ]);
+        return this.exclude(account, ['password', 'updatedAt', 'createdAt']);
     }
 
     async delete(id: number): Promise<AccountDto> {

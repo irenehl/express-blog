@@ -1,11 +1,21 @@
+import aws from '../config/aws';
 import { allAccountsMock, userAccountMock } from '../tests/mocks/account.mock';
 import { prismaMock } from '../tests/mocks/prisma.mock';
 import { AccountService } from './acount.service';
+
 let accountService: AccountService;
+
+jest.mock('../config/aws', () => {
+    const ses = {
+        send: jest.fn(),
+    };
+
+    return ses;
+});
 
 describe('AccountService', () => {
     beforeEach(() => {
-        accountService = new AccountService(prismaMock);
+        accountService = new AccountService(aws, prismaMock);
     });
 
     describe('/accounts', () => {
@@ -20,6 +30,7 @@ describe('AccountService', () => {
                 password: 'password123',
             });
 
+            expect(aws.send).toHaveBeenCalled();
             expect(result).toEqual(userAccountMock);
         });
 
