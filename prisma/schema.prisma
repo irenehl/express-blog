@@ -39,9 +39,9 @@ model Comment {
     createdAt           DateTime              @default(now()) @map("created_at")
     updatedAt           DateTime              @default(now()) @map("updated_at")
     reports             Report[]
-    author              Account               @relation(fields: [authorId], references: [id])
+    author              Account               @relation(fields: [authorId], references: [id], onDelete: Cascade)
     authorId            Int                   @map("author_id")
-    post                Post                  @relation(fields: [postId], references: [id])
+    post                Post                  @relation(fields: [postId], references: [id], onDelete: Cascade)
     postId              Int                   @map("post_id")
     ReactionsOnComments ReactionsOnComments[]
 }
@@ -53,7 +53,7 @@ model Post {
     createdAt        DateTime           @default(now()) @map("created_at")
     updatedAt        DateTime           @default(now()) @map("updated_at")
     reports          Report[]
-    author           Account            @relation(fields: [authorId], references: [id])
+    author           Account            @relation(fields: [authorId], references: [id], onDelete: Cascade)
     authorId         Int                @map("author_id")
     comments         Comment[]
     ReactionsOnPosts ReactionsOnPosts[]
@@ -63,19 +63,19 @@ model Report {
     id          Int      @id @default(autoincrement())
     description String
     createdAt   DateTime @default(now()) @map("created_at")
-    author      Account  @relation(fields: [authorId], references: [id])
+    author      Account  @relation(fields: [authorId], references: [id], onDelete: Cascade)
     authorId    Int      @map("author_id")
-    comment     Comment? @relation(fields: [commentId], references: [id])
+    comment     Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
     commentId   Int?     @map("comment_id")
-    post        Post?    @relation(fields: [postId], references: [id])
+    post        Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
     postId      Int?     @map("post_id")
 }
 
 model ReactionsOnComments {
     reaction  Reactions
-    comment   Comment   @relation(fields: [commentId], references: [id])
+    comment   Comment   @relation(fields: [commentId], references: [id], onDelete: Cascade)
     commentId Int       @map("comment_id")
-    author    Account   @relation(fields: [authorId], references: [id])
+    author    Account   @relation(fields: [authorId], references: [id], onDelete: Cascade)
     authorId  Int       @map("author_id")
 
     @@id([authorId, commentId])
@@ -83,9 +83,9 @@ model ReactionsOnComments {
 
 model ReactionsOnPosts {
     reaction Reactions
-    post     Post      @relation(fields: [postId], references: [id])
+    post     Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
     postId   Int       @map("post_id")
-    author   Account   @relation(fields: [authorId], references: [id])
+    author   Account   @relation(fields: [authorId], references: [id], onDelete: Cascade)
     authorId Int       @map("author_id")
 
     @@id([postId, authorId])

@@ -157,28 +157,6 @@ export class CommentRepository {
         });
     }
 
-    async deleteAllComments(commentId: number) {
-        await this.prismaClient.reactionsOnComments.deleteMany({
-            where: {
-                commentId,
-            },
-        });
-
-        return await this.prismaClient.comment.deleteMany({
-            where: {
-                id: commentId,
-            },
-        });
-    }
-
-    // async deleteAllReactions(commentId: number) {
-    //     return await this.prismaClient.reactionsOnComments.deleteMany({
-    //         where: {
-    //             commentId,
-    //         },
-    //     });
-    // }
-
     async belongsTo(authorId: number, commentId: number) {
         const comment = await this.prismaClient.comment.findFirst({
             where: {

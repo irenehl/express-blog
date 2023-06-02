@@ -7,26 +7,19 @@ import { PostDto } from './dto/post.dto';
 import { Pagination } from '../common/interfaces/pagination';
 import { ReportDto } from '../common/dtos/report.dto';
 import { MailService } from '../mail/mail.service';
-import { CommentRepository } from '../comment/comment.repository';
 import { SESClient } from '@aws-sdk/client-ses';
 import postReportHtml from '../templates/post-report.html';
 import validateSchema from '../common/validate';
-import {
-    createPostSchema,
-    reportPostSchema,
-    updatePostSchema,
-} from './post.validator';
+import { createPostSchema, updatePostSchema } from './post.validator';
 
 export class PostService {
     private readonly postRepository: PostRepository;
     private readonly accountService: AccountService;
-    private readonly commentRepository: CommentRepository; // To avoid redundancy
     private readonly mailService: MailService;
 
     constructor(aws: SESClient, prismaClient: PrismaClient) {
         this.postRepository = new PostRepository(prismaClient);
         this.accountService = new AccountService(aws, prismaClient);
-        this.commentRepository = new CommentRepository(prismaClient);
         this.mailService = new MailService(aws);
     }
 
@@ -149,11 +142,6 @@ export class PostService {
         }
 
         if (!canDelete) throw new HttpError(403, 'Forbidden');
-
-        const post = await this.getPost({ id });
-
-        //await this.commentRepository.deleteAllReactions(id);
-        await this.commentRepository.deleteAllComments(id);
 
         return await this.postRepository.delete(id);
     }

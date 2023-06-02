@@ -81,9 +81,7 @@ export class AccountService {
         return account;
     }
 
-    async delete(id: number): Promise<AccountDto> {
-        await this.postRepository.deleteAllPostAndComments(id);
-
+    async delete(id: number): Promise<AccountDto | null> {
         return await this.accountRepository.delete(id);
     }
 }

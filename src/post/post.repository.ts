@@ -147,21 +147,6 @@ export class PostRepository {
         });
     }
 
-    async deleteAllPostAndComments(authorId: number) {
-        await Promise.all([
-            this.prismaClient.post.deleteMany({
-                where: {
-                    authorId,
-                },
-            }),
-            this.prismaClient.comment.deleteMany({
-                where: {
-                    authorId,
-                },
-            }),
-        ]);
-    }
-
     async belongsTo(authorId: number, postId: number) {
         const post = await this.prismaClient.post.findFirst({
             where: {
