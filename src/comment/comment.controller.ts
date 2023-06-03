@@ -10,7 +10,7 @@ export class CommentController {
         this.commentService = new CommentService(aws, prisma);
     }
 
-    async create(req: any, res: Response) {
+    async create(req: Request, res: Response) {
         return res
             .status(200)
             .json(
