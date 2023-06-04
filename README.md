@@ -7,8 +7,9 @@
 * [Environment](#environment)
 * [Schemas](#schemas)
 * [Endpoints](#endpoints)
-* [Deploy](#deploy)
+* [Extra points](#extra-points)
 * [Test coverage](#test-coverage)
+* [Notes](#notes)
 
 ## Description
 
@@ -108,10 +109,18 @@ You can find all the prisma schemas [here](prisma/schema.prisma)
 
 Endpoints are documented in [Insonmia client](https://insomnia.rest/download), you can file the JSON file [here](src/docs/blog-api.json) 
 
-## Deploy
+## Extra points
+
+- [x] Recovery password
+- [x] Report a comment
+- [ ] Deploy (I tried but it fails, [this](https://rest-module-daniela.azurewebsites.net/) is the link, I tried to deploy with Azure)
 
 ## Test coverage
 
 This project has 100% of coverage
 
 ![image](https://github.com/irenehl/nerdery-rest-module/assets/54600515/1b1c3915-56eb-403a-aa9e-a7c8413e696d)
+
+## Notes
+
+I worked with AWS SES to send the emails, I already made a request to have a production environment with AWS but at this point I don't have any response from them, so, please when you start reviewing let me know so I can add your email as a verified email in AWS and you'll able to test all the functionality 
