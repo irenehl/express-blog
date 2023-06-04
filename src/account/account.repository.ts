@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import { Account, Prisma, PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { CreateAccountDto } from './dtos/create-account.dto';
@@ -34,7 +35,7 @@ export class AccountRepository extends BaseRepository<Account> {
                 data: {
                     ...dto,
                     password: hashedPassword,
-                    verifyEmailToken: crypto.randomUUID(),
+                    verifyEmailToken: uuid(),
                 },
             }),
             ['password']

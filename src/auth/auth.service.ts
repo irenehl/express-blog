@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import { v4 as uuid } from 'uuid';
 import jwt from 'jsonwebtoken';
 import { LoginDto } from './dto/login.dto';
 import { AuthRepository } from './auth.repository';
@@ -59,7 +59,7 @@ export class AuthService {
             email,
         });
 
-        const recoveryToken = crypto.randomUUID();
+        const recoveryToken = uuid();
 
         await this.accountService.update(account!.id, {
             recoveryToken,

@@ -26,7 +26,8 @@
         "passport": "^0.6.0",
         "passport-jwt": "^4.0.1",
         "prisma": "^4.14.0",
-        "swagger-ui-express": "^4.6.3"
+        "swagger-ui-express": "^4.6.3",
+        "uuid": "^9.0.0"
     },
     "devDependencies": {
         "@faker-js/faker": "^8.0.0",
@@ -36,6 +37,7 @@
         "@types/jsonwebtoken": "^9.0.2",
         "@types/passport": "^1.0.12",
         "@types/passport-jwt": "^3.0.8",
+        "@types/uuid": "^9.0.1",
         "@typescript-eslint/eslint-plugin": "^5.59.6",
         "@typescript-eslint/parser": "^5.59.6",
         "bcrypt": "^5.1.0",
